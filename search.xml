@@ -6,6 +6,7 @@
     <content><![CDATA[<blockquote>
 <p>Promise 一种更优的异步编程统一方案。<br>它出现的原因是：直接使用传统回调方式去完成复杂的异步流程就无法避免大量的回调函数嵌套，也就是我们所说的回调地狱。为了避免回调地狱的问题，CommonJS社区提出了Promise的规范，目的就是为异步编程提供一种更合理，更强大的统一解决方案。在ES2015中被标准化，成为语言规范。</p>
 </blockquote>
+<a id="more"></a>
 <h4 id="Promise-概述"><a href="#Promise-概述" class="headerlink" title="Promise 概述"></a>Promise 概述</h4><p>Promise：所谓Promise就是一个对象，用来表示一个异步任务最终结束之后，它究竟是成功还是失败。就像是内部对外界做出的一个承诺。开始这个承诺处于待定状态（英文叫Pending），最终有可能成功（英文叫Fulfilled），也有可能失败（英文叫Rejected）。结束之后，承诺最终不管是达成还是失败，你都会有相对应的反应。也就是在承诺状态确定之后，都会有相对应的任务会被自动执行。比如Ajax请求，请求成功就调onFulfilled回调，请求失败就调onRejected回调。</p>
 <p>特点：一旦明确了结果过后，就不可能在发生改变</p>
 <p><img src="../images/promiseStates.png"></p>
@@ -106,6 +107,8 @@
     <content><![CDATA[<blockquote>
 <p>在es2015中，Proxy是为对象设置访问代理器（代理如同门卫），它可以轻松监视到对象的读写过程。</p>
 </blockquote>
+<a id="more"></a>
+
 <h4 id="proxy的应用场景示例"><a href="#proxy的应用场景示例" class="headerlink" title="proxy的应用场景示例"></a>proxy的应用场景示例</h4><p>在es2015之前，如果我们想要监视某个对象的属性读写，那我们可以使用es5 提供的Object.defineProperty方法来为我们的对象添加属性，捕获到对象属性的读写过程（Vue3.0之前 就是使用这个方法实现数据响应，从而实现数据双向绑定）。</p>
 <h4 id="那我们如何使用Proxy？"><a href="#那我们如何使用Proxy？" class="headerlink" title="那我们如何使用Proxy？"></a>那我们如何使用Proxy？</h4><ul>
 <li>new Proxy(<code>需要代理的目标对象</code>， <code>代理的处理对象</code>);</li>
