@@ -19,7 +19,7 @@
 
 <script class="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"laceyx.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"left","width":320,"display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+    var CONFIG = {"hostname":"laceyx.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"right","width":320,"display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
   <meta name="description" content="在es2015中，Proxy是为对象设置访问代理器（代理如同门卫），它可以轻松监视到对象的读写过程。  proxy的应用场景示例在es2015之前，如果我们想要监视某个对象的属性读写，那我们可以使用es5 提供的Object.defineProperty方法来为我们的对象添加属性，捕获到对象属性的读写过程（Vue3.0之前 就是使用这个方法实现数据响应，从而实现数据双向绑定）。 那我们如何使用P">
@@ -94,6 +94,9 @@
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
   <div class="headband"></div>
 
   <main class="main">
@@ -129,31 +132,31 @@
   <ul class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+    <a href="/" rel="section">首页</a>
 
   </li>
         <li class="menu-item menu-item-about">
 
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+    <a href="/about/" rel="section">关于</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+    <a href="/tags/" rel="section">标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+    <a href="/categories/" rel="section">分类</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+    <a href="/archives/" rel="section">归档</a>
 
   </li>
       <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        <a role="button" class="popup-trigger">搜索
         </a>
       </li>
   </ul>
@@ -215,7 +218,7 @@
       <section class="site-overview-wrap sidebar-panel">
         <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Lacey Xu"
-      src="/images/avatar.gif">
+      src="/images/userPic.jpeg">
   <p class="site-author-name" itemprop="name">Lacey Xu</p>
   <div class="site-description" itemprop="description">既然选择了远方，便只顾风雨兼程</div>
 </div>
@@ -230,6 +233,14 @@
       </div>
   </nav>
 </div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/laceyX" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;laceyX" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/15798017853@163.com" title="E-Mail → 15798017853@163.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
 
 
 
@@ -259,194 +270,7 @@
 
       
 
-    
   
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://laceyx.github.io/2021/01/22/proxy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Lacey Xu">
-      <meta itemprop="description" content="既然选择了远方，便只顾风雨兼程">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lacey Xu's Blog">
-    </span>
-
-    
-    
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          ES6 之 Proxy使用
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-01-22 16:17:58" itemprop="dateCreated datePublished" datetime="2021-01-22T16:17:58+08:00">2021-01-22</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2021-02-25 15:20:24" itemprop="dateModified" datetime="2021-02-25T15:20:24+08:00">2021-02-25</time>
-      </span>
-
-  
-    <span id="/2021/01/22/proxy/" class="post-meta-item leancloud_visitors" data-flag-title="ES6 之 Proxy使用" title="阅读次数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span class="leancloud-visitors-count"></span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-        <blockquote>
-<p>在es2015中，Proxy是为对象设置访问代理器（代理如同门卫），它可以轻松监视到对象的读写过程。</p>
-</blockquote>
-<h4 id="proxy的应用场景示例"><a href="#proxy的应用场景示例" class="headerlink" title="proxy的应用场景示例"></a>proxy的应用场景示例</h4><p>在es2015之前，如果我们想要监视某个对象的属性读写，那我们可以使用es5 提供的Object.defineProperty方法来为我们的对象添加属性，捕获到对象属性的读写过程（Vue3.0之前 就是使用这个方法实现数据响应，从而实现数据双向绑定）。</p>
-<h4 id="那我们如何使用Proxy？"><a href="#那我们如何使用Proxy？" class="headerlink" title="那我们如何使用Proxy？"></a>那我们如何使用Proxy？</h4><ul>
-<li>new Proxy(<code>需要代理的目标对象</code>， <code>代理的处理对象</code>);</li>
-<li>首先抛出示例代码  </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">const person &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age: 20</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 第一个参数是需要代理的目标对象（person），第二个参数也是一个对象（代理的处理对象）</span><br><span class="line">const personProxy &#x3D; new Proxy(person, &#123;</span><br><span class="line">  &#x2F;&#x2F; 两个参数：目标对象和属性名</span><br><span class="line">  get(target, property)&#123;</span><br><span class="line">    return property in target ? target[property]: &#39;default&#39;;</span><br><span class="line">    console.log(target, property); &#x2F;&#x2F; &#123; name: &#39;xh&#39;, age: 20 &#125; name</span><br><span class="line">    &#x2F;&#x2F; return 100;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#x2F;&#x2F; 三个参数：目标对象，属性名，属性值</span><br><span class="line">  set(target, property, value)&#123;</span><br><span class="line">    if(property &#x3D;&#x3D;&#x3D; &#39;age&#39;) &#123; &#x2F;&#x2F; 在这里可以对属性值做一些处理</span><br><span class="line">      if (!Number.isInteger(value))&#123;</span><br><span class="line">        throw new TypeError(&#96;$&#123;value&#125; is not an int&#96;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return target[property] &#x3D; value;</span><br><span class="line">    console.log(target, property, value); &#x2F;&#x2F; &#123; name: &#39;xh&#39;, age: 20 &#125; gender true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">console.log(personProxy.name); &#x2F;&#x2F; xh</span><br><span class="line">console.log(personProxy.xxx); &#x2F;&#x2F; default</span><br><span class="line">&#x2F;&#x2F; personProxy.age &#x3D; &#39;ss&#39;; &#x2F;&#x2F; 报错</span><br><span class="line">personProxy.gender &#x3D; true</span><br></pre></td></tr></table></figure>
-<hr>
-<p>都知道在Vue3.0中使用proxy替代了Object.defineProperty(),那相对于 Object.defineProperty()，proxy有什么优势呢?</p>
-<h4 id="proxy的优势"><a href="#proxy的优势" class="headerlink" title="proxy的优势"></a>proxy的优势</h4><h5 id="Proxy能够监视到更多对象操作"><a href="#Proxy能够监视到更多对象操作" class="headerlink" title="Proxy能够监视到更多对象操作"></a>Proxy能够监视到更多对象操作</h5><p>Proxy更强大一些：defineProperty 只能监视对象属性的读写，而Proxy能够监视到更多对象操作（比如说delete 操作，对对象方法的调用等等）。</p>
-<ul>
-<li>deleteProperty代理方法：当外部对当前这个代理对象进行delete操作的时,会自动执行</li>
-</ul>
-<p>举个栗子  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">const person &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age: 20</span><br><span class="line">&#125;</span><br><span class="line">const personProxy &#x3D; new Proxy(person, &#123;</span><br><span class="line">  &#x2F;&#x2F; 两个参数：代理目标对象，所删除的属性名</span><br><span class="line">  deleteProperty(target, property)&#123;</span><br><span class="line">    console.log(&#39;delete&#39;, property); &#x2F;&#x2F; delete age</span><br><span class="line">    delete target[property]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">delete personProxy.age;</span><br><span class="line">console.log(person); &#x2F;&#x2F; &#123; name: &#39;xh&#39; &#125;</span><br></pre></td></tr></table></figure>
-<p>当然不仅仅是监视delete操作，还有其他的，proxy 可以检测到的对象操作如下：  </p>
-<table>
-<thead>
-<tr>
-<th>handler方法</th>
-<th>触发方式</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>get</td>
-<td>读取某个属性</td>
-</tr>
-<tr>
-<td>set</td>
-<td>写入某个属性</td>
-</tr>
-<tr>
-<td>has</td>
-<td>in 操作符</td>
-</tr>
-<tr>
-<td>deleteProperty</td>
-<td>delete 操作符</td>
-</tr>
-<tr>
-<td>getProperty</td>
-<td>Object.getPropertypeOf()</td>
-</tr>
-<tr>
-<td>setProperty</td>
-<td>Object.setPropertypeOf()</td>
-</tr>
-<tr>
-<td>isExtensible</td>
-<td>Object.isExtensible()</td>
-</tr>
-<tr>
-<td>preventExtensions</td>
-<td>Object.preventExtensions()</td>
-</tr>
-<tr>
-<td>getOwnPropertyDescriptor</td>
-<td>Object.getOwnPropertyDescriptor()</td>
-</tr>
-<tr>
-<td>defineProperty</td>
-<td>Object.defineProperty()</td>
-</tr>
-<tr>
-<td>ownkeys</td>
-<td>Object.keys()、Object.getOwnPropertyNames()、Object.getOwnPropertySymbols()</td>
-</tr>
-<tr>
-<td>apply</td>
-<td>调用一个函数</td>
-</tr>
-<tr>
-<td>construct</td>
-<td>用 new 调用一个函数</td>
-</tr>
-</tbody></table>
-<p>并且 Proxy 更好的支持数组对象的监视。<br>Object.defineProperty监听对数组的操作，就是重写数组的操作方法，也是Vue.js中所使用的方式（用自定义的方法覆盖掉数组原型上的方法比如说 push 等等），以此来劫持数组调用的过程。</p>
-<p>如何使用 Proxy 对象监视数组呢</p>
-<p>再举个栗子，你就明白了  </p>
-<pre><code>  const list = [];
-  const listProxy = new Proxy(list, &#123;
-    set(target,property, value) &#123;
-      console.log(&#39;set&#39;,property, value);
-      target[property] = value;
-      return true; // 表示设置成功
-    &#125;
-  &#125;);
-  listProxy.push(100); //set 0 100 (0 是数组下标，100 是数组下标对应的值)</code></pre>
-<p>使用Proxy对数组进行监听不需要进行额外的操作，相对于Object.defineProperty就简便很多。</p>
-<h5 id="Proxy-是以非侵入的方式监管了对象的读写"><a href="#Proxy-是以非侵入的方式监管了对象的读写" class="headerlink" title="Proxy 是以非侵入的方式监管了对象的读写"></a>Proxy 是以非侵入的方式监管了对象的读写</h5><p>这是什么意思呢：一个已经定义好的对象，我们不需要对对象本身做任何的操作就可以监听到对象的读写。而Object.defineProperty就要求我们必须要经过特定的方式，单独去定义对象当中那些需要被监视的属性，那样对一个已经存在的属性，我们要做很多额外的操作。</p>
-<p>再举个栗子  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">const person &#x3D; &#123;&#125;</span><br><span class="line">Object.defineProperty(person, &#39;name&#39;, &#123;</span><br><span class="line">  get() &#123;</span><br><span class="line">    console.log(&#39;name 被访问&#39;);</span><br><span class="line">    return person._name</span><br><span class="line">  &#125;,</span><br><span class="line">  set (value) &#123;</span><br><span class="line">    console.log(&#39;name 被设置&#39;);</span><br><span class="line">    person._name &#x3D; value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">Object.defineProperty(person, &#39;age&#39;, &#123;</span><br><span class="line">  get() &#123;</span><br><span class="line">    console.log(&#39;age 被访问&#39;);</span><br><span class="line">    return person._age</span><br><span class="line">  &#125;,</span><br><span class="line">  set (value) &#123;</span><br><span class="line">    console.log(&#39;age 被设置&#39;);</span><br><span class="line">    person._age &#x3D; value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">person.name &#x3D; &#39;jack&#39;;</span><br><span class="line">console.log(person.name); </span><br><span class="line">&#x2F;&#x2F;输出log如下：name 被设置 name 被访问 jack jack</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>相对于Object.defineProperty方式，Proxy 方式更合理，且代码更加简洁</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const person2 &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age: 20</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">const personProxy &#x3D; new Proxy(person2, &#123;</span><br><span class="line">  get(target, property)&#123;</span><br><span class="line">    return target[property];</span><br><span class="line">  &#125;,</span><br><span class="line">  set (target, property, value) &#123;</span><br><span class="line">    target[property] &#x3D; value;</span><br><span class="line">    return true;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">personProxy.name &#x3D; &#39;jack&#39;;</span><br><span class="line">console.log(personProxy.name); &#x2F;&#x2F; jack</span><br></pre></td></tr></table></figure>
-
-<h5 id="Proxy监听性能有所提升"><a href="#Proxy监听性能有所提升" class="headerlink" title="Proxy监听性能有所提升"></a>Proxy监听性能有所提升</h5><p>Proxy监听相对于Object.defineProperty性能更好。因为Proxy在get里进行递归（不get就不递归），什么时候用（也就是说什么时候get到）什么时候才监听，而Object.defineProperty是一次性全部递归完成。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const data &#x3D; [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span><br><span class="line"></span><br><span class="line">const proxyData &#x3D; new Proxy(data, &#123;</span><br><span class="line">    get(target, key, receiver) &#123;</span><br><span class="line">        &#x2F;&#x2F; 只处理本身（非原型的）属性</span><br><span class="line">        const ownKeys &#x3D; Reflect.ownKeys(target)</span><br><span class="line">        if (ownKeys.includes(key)) &#123;</span><br><span class="line">            console.log(&#39;get&#39;, key) &#x2F;&#x2F; 监听</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        const result &#x3D; Reflect.get(target, key, receiver)</span><br><span class="line">        return result &#x2F;&#x2F; 返回结果</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<h4 id="proxy总结"><a href="#proxy总结" class="headerlink" title="proxy总结"></a>proxy总结</h4><blockquote>
-<p>Proxy 能够监视到更多对象操作,比如说可监听 新增/删除 属性等等<br>Proxy 是以非侵入的方式监管了对象的读写<br>Proxy 性能更好</p>
-</blockquote>
-<p>感谢您的阅读～</p>
-
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-            </div>
-            <div class="post-nav-item">
-                <a href="/2021/02/25/promise/" rel="next" title="ES6 之 Promise">
-                  ES6 之 Promise <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-  
-  
-  
-
 
 
       
@@ -491,9 +315,44 @@
   </span>
   <span class="author" itemprop="copyrightHolder">Lacey@XU</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
-  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/04/2020 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
     </div>
   </footer>
 
@@ -520,6 +379,7 @@
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
 
