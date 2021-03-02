@@ -180,15 +180,7 @@
 </tbody></table>
 <p>并且 Proxy 更好的支持数组对象的监视。<br>Object.defineProperty监听对数组的操作，就是重写数组的操作方法，也是Vue.js中所使用的方式（用自定义的方法覆盖掉数组原型上的方法比如说 push 等等），以此来劫持数组调用的过程。</p>
 <p>如何使用 Proxy 对象监视数组呢？再举个栗子，你就明白了</p>
-<pre><code>  const list = [];
-  const listProxy = new Proxy(list, &#123;
-    set(target,property, value) &#123;
-      console.log(&#39;set&#39;,property, value);
-      target[property] = value;
-      return true; // 表示设置成功
-    &#125;
-  &#125;);
-  listProxy.push(100); //set 0 100 (0 是数组下标，100 是数组下标对应的值)</code></pre>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const list &#x3D; [];</span><br><span class="line">const listProxy &#x3D; new Proxy(list, &#123;</span><br><span class="line">  set(target,property, value) &#123;</span><br><span class="line">    console.log(&#39;set&#39;,property, value);</span><br><span class="line">    target[property] &#x3D; value;</span><br><span class="line">    return true; &#x2F;&#x2F; 表示设置成功</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line">listProxy.push(100); &#x2F;&#x2F;set 0 100 (0 是数组下标，100 是数组下标对应的值)</span><br></pre></td></tr></table></figure>
 <p>使用Proxy对数组进行监听不需要进行额外的操作，相对于Object.defineProperty就简便很多。</p>
 <h5 id="Proxy-是以非侵入的方式监管了对象的读写"><a href="#Proxy-是以非侵入的方式监管了对象的读写" class="headerlink" title="Proxy 是以非侵入的方式监管了对象的读写"></a>Proxy 是以非侵入的方式监管了对象的读写</h5><p>这是什么意思呢：一个已经定义好的对象，我们不需要对对象本身做任何的操作就可以监听到对象的读写。而Object.defineProperty就要求我们必须要经过特定的方式，单独去定义对象当中那些需要被监视的属性，那样对一个已经存在的属性，我们要做很多额外的操作。</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const person &#x3D; &#123;&#125;</span><br><span class="line">Object.defineProperty(person, &#39;name&#39;, &#123;</span><br><span class="line">  get() &#123;</span><br><span class="line">    console.log(&#39;name 被访问&#39;);</span><br><span class="line">    return person._name</span><br><span class="line">  &#125;,</span><br><span class="line">  set (value) &#123;</span><br><span class="line">    console.log(&#39;name 被设置&#39;);</span><br><span class="line">    person._name &#x3D; value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">Object.defineProperty(person, &#39;age&#39;, &#123;</span><br><span class="line">  get() &#123;</span><br><span class="line">    console.log(&#39;age 被访问&#39;);</span><br><span class="line">    return person._age</span><br><span class="line">  &#125;,</span><br><span class="line">  set (value) &#123;</span><br><span class="line">    console.log(&#39;age 被设置&#39;);</span><br><span class="line">    person._age &#x3D; value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">person.name &#x3D; &#39;jack&#39;;</span><br><span class="line">console.log(person.name); </span><br><span class="line">&#x2F;&#x2F;输出log如下：name 被设置 name 被访问 jack jack</span><br><span class="line"></span><br></pre></td></tr></table></figure>
