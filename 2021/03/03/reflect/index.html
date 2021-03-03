@@ -22,18 +22,21 @@
     var CONFIG = {"hostname":"laceyx.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"right","width":320,"display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
-  <meta name="description" content="既然选择了远方，便只顾风雨兼程">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lacey Xu&#39;s Blog">
-<meta property="og:url" content="https://laceyx.github.io/archives/index.html">
+  <meta name="description" content="Reflect是es2015中提供的一种全新的内置对象（统一的对象操作API）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES6 之 Reflect">
+<meta property="og:url" content="https://laceyx.github.io/2021/03/03/reflect/index.html">
 <meta property="og:site_name" content="Lacey Xu&#39;s Blog">
-<meta property="og:description" content="既然选择了远方，便只顾风雨兼程">
+<meta property="og:description" content="Reflect是es2015中提供的一种全新的内置对象（统一的对象操作API）。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-03T09:03:26.364Z">
+<meta property="article:modified_time" content="2021-03-03T09:26:14.901Z">
 <meta property="article:author" content="Lacey Xu">
+<meta property="article:tag" content="Reflect">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://laceyx.github.io/archives/">
+<link rel="canonical" href="https://laceyx.github.io/2021/03/03/reflect/">
 
 
 <script class="page-configurations">
@@ -41,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Lacey Xu's Blog</title>
+  <title>ES6 之 Reflect | Lacey Xu's Blog</title>
   
 
 
@@ -269,115 +272,130 @@
 </noscript>
 
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
       
 
       
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 4 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://laceyx.github.io/2021/03/03/reflect/">
 
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userPic.jpeg">
+      <meta itemprop="name" content="Lacey Xu">
+      <meta itemprop="description" content="既然选择了远方，便只顾风雨兼程">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lacey Xu's Blog">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ES6 之 Reflect
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+
+      <time title="创建时间：2021-03-03 17:03:26 / 修改时间：17:26:14" itemprop="dateCreated datePublished" datetime="2021-03-03T17:03:26+08:00">2021-03-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ES6-%E7%B3%BB%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">ES6+系列</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/2021/03/03/reflect/" class="post-meta-item leancloud_visitors" data-flag-title="ES6 之 Reflect" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>Reflect是es2015中提供的一种全新的内置对象（统一的对象操作API）。</p>
+</blockquote>
+<a id="more"></a>
+
+<p>刚开始接触Reflect的时候，我在想为什么需要这个东西？</p>
+<p>查了一些资料才发现，Reflect最大的意义就是：<em>统一提供一套用于操作对象的API</em>。因为在这之前呢，我们去操作对象时有可能用Object对象上的一些方法，也可能是用delete 、in这样的操作符。那这样对于新手来说太乱了，并没有什么规律，Reflect对象就很好的解决了这样的问题，它统一了对象的操作。</p>
+<p>例如下面的例子，我们可以用<code>Reflect.has()</code>代替<code>in</code>操作符，使用<code>Reflect.deleteProperty</code>代替<code>delete</code> 操作符。这样看起来就很统一。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age:18</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(&#39;name&#39; in obj); &#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(delete obj[&#39;age&#39;]);&#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(Object.keys(obj)); &#x2F;&#x2F; [&#39;name&#39;]  使用的是对象方法</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 使用新的Reflect方式，进行同样的操作</span><br><span class="line"></span><br><span class="line">console.log(Reflect.has(obj, &#39;name&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.deleteProperty(obj, &#39;age&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.ownKeys(obj)); &#x2F;&#x2F; [&#39;name&#39;]</span><br></pre></td></tr></table></figure>
+<p>注意：以前的那种操作方式还是可以使用的，ECMAScript官方希望经过一段时间，以后的标准当中就会将之前的那些方式废弃掉，推荐使用Reflect。</p>
+<p>Reflect属于一个静态类，它不能通过new Reflect的方式去构建一个实例对象，只能够去调用这个静态类中的静态方法（如 Math 对象一样）。而且Reflect内部封装了一系列对对象的底层操作。提供了14个静态方法，其中有一个废弃掉了，剩下13个。这个13个对象的方法的方法名与[Proxy中对象中处理对象的方法成员是完全一致的]。Reflect 成员方法就是Proxy处理对象的默认实现。</p>
+<p>在Proxy处理对象中，如果我们没有添加具体的处理方法（比如get/set），那么它的内部这些get/set到底是怎样执行的呢？</p>
+<p>其实Proxy处理对象内部，默认实现的逻辑就是调用了Reflect对象当中所对应的方法。 也就是说我们没有定义get方法就等同于是我们定义了一个get方法，然后将参数原封不动传给Reflect的get方法，这个结果是一样的。</p>
+<p>我们在定义get/set 这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，最后返回通过Reflect中对应方法调用的结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  foo: &#39;123&#39;,</span><br><span class="line">  bar: &#39;456&#39;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const proxy &#x3D; new Proxy(obj, &#123;</span><br><span class="line">  &#x2F;&#x2F; 我们在定义get&#x2F;set 这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，最后返回通过Reflect中对应方法调用的结果。</span><br><span class="line">  get(target, property) &#123;</span><br><span class="line">    console.log(&#39;watch login~&#39;); &#x2F;&#x2F;模拟我们调用的js逻辑</span><br><span class="line">    return Reflect.get(target, property)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">console.log(proxy.foo) </span><br></pre></td></tr></table></figure>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-03-03T17:03:26+08:00"
-              content="2021-03-03">
-          03-03
-        </time>
-      </div>
+    
+    
+    
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/03/reflect/" itemprop="url">
-            <span itemprop="name">ES6 之 Reflect</span>
-          </a>
-      </div>
-
+    <div>
       
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-03-02T14:25:02+08:00"
-              content="2021-03-02">
-          03-02
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/02/symbol/" itemprop="url">
-            <span itemprop="name">ES6 之 Symbol</span>
-          </a>
-      </div>
-
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
       
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-01-22T16:17:58+08:00"
-              content="2021-01-22">
-          01-22
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/01/22/proxy/" itemprop="url">
-            <span itemprop="name">ES6 之 Proxy使用</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2020-07-29T19:04:25+08:00"
-              content="2020-07-29">
-          07-29
-        </time>
-      </div>
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Reflect/" rel="tag"># Reflect</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/07/29/promise/" itemprop="url">
-            <span itemprop="name">ES6 之 Promise</span>
-          </a>
-      </div>
+        
 
-      
-    </header>
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/03/02/symbol/" rel="prev" title="ES6 之 Symbol">
+                  <i class="fa fa-chevron-left"></i> ES6 之 Symbol
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
   </article>
-
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
