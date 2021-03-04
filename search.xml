@@ -12,11 +12,13 @@
 <p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
 <p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
 <p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
-<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：数组、Set、Map等等。<br><img src="'./../../images/iteratorArr.jpg'"><br><img src="'./../../images/iteratorSet.png'"><br><img src="'./../../images/iteratorMap.png'"></p>
+<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：数组、Set、Map等等。<br><img src="/2021/03/04/Iterable/../../images/iteratorArr.jpg'"><br><img src="/2021/03/04/Iterable/../../images/iteratorSet.png'"><br><img src="/2021/03/04/Iterable/../../images/iteratorMap.png'"></p>
+<img src="/2021/03/04/Iterable/iteratorArr.jpg" class title="This is an test image">
+
 <p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
 <p>那这个Iterable 方法是干什么的呢?</p>
 <p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
-<p><img src="'./../../images/iteratorPic.png'"></p>
+<p><img src="/2021/03/04/Iterable/../../images/iteratorPic.png'"></p>
 <blockquote>
 <p>总结一下：所有能直接被 for…of循环遍历的数据类型，它都必须要实现Iterable的接口，就是它在内部都必须要挂载Iterable方法，这个方法要返回一个带有next方法的对象，我们不断调用这个next方法就实现了对数据的遍历。</p>
 </blockquote>
@@ -51,7 +53,7 @@
 <a id="more"></a>
 <h4 id="Promise概述"><a href="#Promise概述" class="headerlink" title="Promise概述"></a>Promise概述</h4><p>Promise：所谓Promise就是一个对象，用来表示一个异步任务最终结束之后，它究竟是成功还是失败。就像是内部对外界做出的一个承诺。开始这个承诺处于待定状态（英文叫Pending），最终有可能成功（英文叫Fulfilled），也有可能失败（英文叫Rejected）。结束之后，承诺最终不管是达成还是失败，你都会有相对应的反应。也就是在承诺状态确定之后，都会有相对应的任务会被自动执行。比如Ajax请求，请求成功就调onFulfilled回调，请求失败就调onRejected回调。</p>
 <p>特点：一旦明确了结果过后，就不可能在发生改变</p>
-<p><img src="../images/promiseStates.png"></p>
+<p><img src="/2020/07/29/promise/images/promiseStates.png"></p>
 <h4 id="Promise基本用法"><a href="#Promise基本用法" class="headerlink" title="Promise基本用法"></a>Promise基本用法</h4><p>Promise是ES2015提供的一个全局类型。</p>
 <p>这个函数在构造Promise中被同步执行，这里用于“兑现”承诺。一般我们将异步任务操作的结果通过resolve的参数传递出去，这个promise对象的状态会修改为fulfilled（成功）；reject用来传递失败的，这个promise对象的状态会修改为rejected（失败）。</p>
 <p>因为Promise的状态一般确定了就不能修改了，所以在这个函数中只能调用这二者中其一。</p>
