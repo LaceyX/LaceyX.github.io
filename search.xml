@@ -17,6 +17,8 @@
 
 
 
+
+
 <p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
 <p>那这个Iterable 方法是干什么的呢?</p>
 <p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
