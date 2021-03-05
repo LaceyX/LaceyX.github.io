@@ -8,15 +8,22 @@
 </blockquote>
 <a id="more"></a>
 
-<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
+<p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
+</blockquote>
 <p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
+<blockquote>
 <p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
+</blockquote>
 <p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
-<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：数组、Set、Map等等。</p>
+<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：Array、Set、Map等等。</p>
+<p>Array:</p>
 <img src="/2021/03/04/Iterable/iteratorArr.jpg" class title="This is an iteratorArr image">
 
+<p>Set:</p>
 
 
+<p>Map:</p>
 
 
 <p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
