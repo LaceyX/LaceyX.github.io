@@ -1,63 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>ES6 之 可迭代接口 Iterable</title>
-    <url>/2021/03/04/Iterable/</url>
-    <content><![CDATA[<blockquote>
-<p>为给各种各样的数据结构提供统一的遍历方式，ES6提供了Iterable接口。</p>
-</blockquote>
-<a id="more"></a>
-
-<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
-<p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
-</blockquote>
-<p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
-<blockquote>
-<p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
-</blockquote>
-<p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
-<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：Array、Set、Map等等。</p>
-<p>Array:</p>
-<img src="/2021/03/04/Iterable/iteratorArr.jpg" class title="This is an iteratorArr image">
-
-<p>Set:</p>
-<img src="/2021/03/04/Iterable/iteratorSet.png" class title="This is an iteratorSet image">
-
-<p>Map:</p>
-<img src="/2021/03/04/Iterable/iteratorMap.png" class title="This is an iteratorMap image">
-
-<p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
-<p>那这个Iterable 方法是干什么的呢?</p>
-<p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
-<img src="/2021/03/04/Iterable/iteratorPic.png" class title="This is an iteratorPic image">
-
-
-<blockquote>
-<p>总结一下：所有能直接被 for…of循环遍历的数据类型，它都必须要实现Iterable的接口，就是它在内部都必须要挂载Iterable方法，这个方法要返回一个带有next方法的对象，我们不断调用这个next方法就实现了对数据的遍历。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const set &#x3D; new Set([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]);</span><br><span class="line"></span><br><span class="line">const iterable &#x3D; set[Symbol.iterator]();</span><br><span class="line"></span><br><span class="line">console.log(iterable.next()); &#x2F;&#x2F; &#123; value: &#39;foo&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;bar&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;baz&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="实现可迭代接口Iterable"><a href="#实现可迭代接口Iterable" class="headerlink" title="实现可迭代接口Iterable"></a>实现可迭代接口Iterable</h4><p>如何在ECMAScript中去实现Iterable接口？</p>
-<p>它实际上就是在这个对象中挂载一个Iterable方法，然后在这个方法中去返回一个迭代器对象。挂载一个Iterable方法，主要有三个方面需要满足：</p>
-<blockquote>
-<ol>
-<li>在最外面的对象实现可迭代接口，叫 Iterable，这个接口约定了内部必须要有一个用于返回迭代器的Iterator方法；</li>
-<li>在中间的Iterator返回的对象，它实现了迭代器接口，叫Iterator，这个接口约定的是内部必须 要有一个用于迭代的next方法；</li>
-<li>在next返回的对象，这个对象实现的是迭代结果接口，叫IterationResult。这个接口约定的就是，我们在这个对象的内部必须要有Value属性用来表示当前被迭代到的数据,它的值可以是任意类型，除此之外还必须有done和布尔值，这个属性用来表示迭代有没有结束。</li>
-</ol>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        return &#123;</span><br><span class="line">          value: &#39;xh&#39;,</span><br><span class="line">          done: true</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>让我们实现一个能够被<code>for...of</code>遍历的对象</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  store: [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    let index &#x3D; 0;</span><br><span class="line">    const self &#x3D; this; &#x2F;&#x2F; next函数中的this并不是obj对象</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        const result &#x3D;  &#123;</span><br><span class="line">          value: self.store[index],</span><br><span class="line">          done: index &gt;&#x3D; self.store.length</span><br><span class="line">        &#125;</span><br><span class="line">        index++;</span><br><span class="line">        return result</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (const item of obj) &#123;</span><br><span class="line">  console.log(item); &#x2F;&#x2F; foo bar baz</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>Iterable</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ES6 之 Promise</title>
     <url>/2020/07/29/promise/</url>
     <content><![CDATA[<blockquote>
@@ -152,6 +95,90 @@
       </categories>
       <tags>
         <tag>promise</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ES6 之 可迭代接口 Iterable</title>
+    <url>/2021/03/04/Iterable/</url>
+    <content><![CDATA[<blockquote>
+<p>为给各种各样的数据结构提供统一的遍历方式，ES6提供了Iterable接口。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
+<p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
+</blockquote>
+<p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
+<blockquote>
+<p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
+</blockquote>
+<p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
+<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：Array、Set、Map等等。</p>
+<p>Array:</p>
+<img src="/2021/03/04/Iterable/iteratorArr.jpg" class title="This is an image">
+
+<p>Set:</p>
+<img src="/2021/03/04/Iterable/iteratorSet.png" class title="This is an image">
+
+<p>Map:</p>
+<img src="/2021/03/04/Iterable/iteratorMap.png" class title="This is an image">
+
+<p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
+<p>那这个Iterable 方法是干什么的呢?</p>
+<p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
+<img src="/2021/03/04/Iterable/iteratorPic.png" class title="This is an image">
+
+
+<blockquote>
+<p>总结一下：所有能直接被 for…of循环遍历的数据类型，它都必须要实现Iterable的接口，就是它在内部都必须要挂载Iterable方法，这个方法要返回一个带有next方法的对象，我们不断调用这个next方法就实现了对数据的遍历。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const set &#x3D; new Set([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]);</span><br><span class="line"></span><br><span class="line">const iterable &#x3D; set[Symbol.iterator]();</span><br><span class="line"></span><br><span class="line">console.log(iterable.next()); &#x2F;&#x2F; &#123; value: &#39;foo&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;bar&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;baz&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="实现可迭代接口Iterable"><a href="#实现可迭代接口Iterable" class="headerlink" title="实现可迭代接口Iterable"></a>实现可迭代接口Iterable</h4><p>如何在ECMAScript中去实现Iterable接口？</p>
+<p>它实际上就是在这个对象中挂载一个Iterable方法，然后在这个方法中去返回一个迭代器对象。挂载一个Iterable方法，主要有三个方面需要满足：</p>
+<blockquote>
+<ol>
+<li>在最外面的对象实现可迭代接口，叫 Iterable，这个接口约定了内部必须要有一个用于返回迭代器的Iterator方法；</li>
+<li>在中间的Iterator返回的对象，它实现了迭代器接口，叫Iterator，这个接口约定的是内部必须 要有一个用于迭代的next方法；</li>
+<li>在next返回的对象，这个对象实现的是迭代结果接口，叫IterationResult。这个接口约定的就是，我们在这个对象的内部必须要有Value属性用来表示当前被迭代到的数据,它的值可以是任意类型，除此之外还必须有done和布尔值，这个属性用来表示迭代有没有结束。</li>
+</ol>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        return &#123;</span><br><span class="line">          value: &#39;xh&#39;,</span><br><span class="line">          done: true</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>让我们实现一个能够被<code>for...of</code>遍历的对象</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  store: [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    let index &#x3D; 0;</span><br><span class="line">    const self &#x3D; this; &#x2F;&#x2F; next函数中的this并不是obj对象</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        const result &#x3D;  &#123;</span><br><span class="line">          value: self.store[index],</span><br><span class="line">          done: index &gt;&#x3D; self.store.length</span><br><span class="line">        &#125;</span><br><span class="line">        index++;</span><br><span class="line">        return result</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (const item of obj) &#123;</span><br><span class="line">  console.log(item); &#x2F;&#x2F; foo bar baz</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>Iterable</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ES6 之 Reflect</title>
+    <url>/2021/03/03/reflect/</url>
+    <content><![CDATA[<blockquote>
+<p>Reflect是ES6中提供的一种全新的内置对象（统一的对象操作API）。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="Reflect的作用"><a href="#Reflect的作用" class="headerlink" title="Reflect的作用"></a>Reflect的作用</h4><p>刚开始接触Reflect的时候，我在想为什么需要这个东西？</p>
+<p>查了一些资料才发现，Reflect最大的意义就是：<strong>统一提供一套用于操作对象的API</strong>。因为在这之前呢，我们去操作对象时有可能用Object对象上的一些方法，也可能是用delete 、in这样的操作符。那这样对于新手来说太乱了，并没有什么规律，Reflect对象就很好的解决了这样的问题，它统一了对象的操作。</p>
+<p>例如下面的例子，我们可以用<code>Reflect.has()</code>代替<code>in</code>操作符，使用<code>Reflect.deleteProperty</code>代替<code>delete</code>操作符。这样看起来就很统一。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age:18</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(&#39;name&#39; in obj); &#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(delete obj[&#39;age&#39;]);&#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(Object.keys(obj)); &#x2F;&#x2F; [&#39;name&#39;]  使用的是对象方法</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 使用新的Reflect方式，进行同样的操作</span><br><span class="line"></span><br><span class="line">console.log(Reflect.has(obj, &#39;name&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.deleteProperty(obj, &#39;age&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.ownKeys(obj)); &#x2F;&#x2F; [&#39;name&#39;]</span><br></pre></td></tr></table></figure>
+<p>注意：以前的那种操作方式还是可以使用的，ECMAScript官方希望经过一段时间，以后的标准当中就会将之前的那些方式废弃掉，推荐使用Reflect。</p>
+<h4 id="Proxy与Reflect配合使用"><a href="#Proxy与Reflect配合使用" class="headerlink" title="Proxy与Reflect配合使用"></a>Proxy与Reflect配合使用</h4><p>Reflect属于一个静态类，它不能通过new Reflect的方式去构建一个实例对象，只能够去调用这个静态类中的静态方法（如 Math 对象一样）。而且Reflect内部封装了一系列对对象的底层操作。提供了14个静态方法，其中有一个废弃掉了，剩下13个。这个13个对象的方法的方法名与<a href="https://laceyx.github.io/2021/01/22/proxy/#more">Proxy中对象中处理对象的方法成员是完全一致的</a>。Reflect成员方法就是Proxy处理对象的默认实现。</p>
+<p>在Proxy处理对象中，如果我们没有添加具体的处理方法（比如get/set），那么它的内部这些get/set到底是怎样执行的呢？看个小例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  foo: &#39;123&#39;,</span><br><span class="line">  bar: &#39;456&#39;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const proxy &#x3D; new Proxy(obj, &#123;</span><br><span class="line">  &#x2F;&#x2F; 我们在定义get&#x2F;set 这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，</span><br><span class="line">  &#x2F;&#x2F; 最后返回通过Reflect中对应方法调用的结果。</span><br><span class="line">  get(target, property) &#123;</span><br><span class="line">    console.log(&#39;watch login~&#39;); &#x2F;&#x2F;模拟我们调用的js逻辑</span><br><span class="line">    return Reflect.get(target, property)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">console.log(proxy.foo) </span><br></pre></td></tr></table></figure>
+<p>其实Proxy处理对象内部，默认实现的逻辑就是调用了Reflect对象当中所对应的方法。也就是说我们没有定义get方法就等同于是我们定义了一个get方法，然后将参数原封不动传给Reflect的get方法，这个结果是一样的。</p>
+<p>我们在定义get/set这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，最后返回通过Reflect中对应方法调用的结果。</p>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>Reflect</tag>
       </tags>
   </entry>
   <entry>
@@ -257,33 +284,6 @@
       </categories>
       <tags>
         <tag>Proxy</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ES6 之 Reflect</title>
-    <url>/2021/03/03/reflect/</url>
-    <content><![CDATA[<blockquote>
-<p>Reflect是ES6中提供的一种全新的内置对象（统一的对象操作API）。</p>
-</blockquote>
-<a id="more"></a>
-
-<h4 id="Reflect的作用"><a href="#Reflect的作用" class="headerlink" title="Reflect的作用"></a>Reflect的作用</h4><p>刚开始接触Reflect的时候，我在想为什么需要这个东西？</p>
-<p>查了一些资料才发现，Reflect最大的意义就是：<strong>统一提供一套用于操作对象的API</strong>。因为在这之前呢，我们去操作对象时有可能用Object对象上的一些方法，也可能是用delete 、in这样的操作符。那这样对于新手来说太乱了，并没有什么规律，Reflect对象就很好的解决了这样的问题，它统一了对象的操作。</p>
-<p>例如下面的例子，我们可以用<code>Reflect.has()</code>代替<code>in</code>操作符，使用<code>Reflect.deleteProperty</code>代替<code>delete</code>操作符。这样看起来就很统一。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  name: &#39;xh&#39;,</span><br><span class="line">  age:18</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(&#39;name&#39; in obj); &#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(delete obj[&#39;age&#39;]);&#x2F;&#x2F; true 使用的是操作符</span><br><span class="line">console.log(Object.keys(obj)); &#x2F;&#x2F; [&#39;name&#39;]  使用的是对象方法</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 使用新的Reflect方式，进行同样的操作</span><br><span class="line"></span><br><span class="line">console.log(Reflect.has(obj, &#39;name&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.deleteProperty(obj, &#39;age&#39;)); &#x2F;&#x2F; true</span><br><span class="line">console.log(Reflect.ownKeys(obj)); &#x2F;&#x2F; [&#39;name&#39;]</span><br></pre></td></tr></table></figure>
-<p>注意：以前的那种操作方式还是可以使用的，ECMAScript官方希望经过一段时间，以后的标准当中就会将之前的那些方式废弃掉，推荐使用Reflect。</p>
-<h4 id="Proxy与Reflect配合使用"><a href="#Proxy与Reflect配合使用" class="headerlink" title="Proxy与Reflect配合使用"></a>Proxy与Reflect配合使用</h4><p>Reflect属于一个静态类，它不能通过new Reflect的方式去构建一个实例对象，只能够去调用这个静态类中的静态方法（如 Math 对象一样）。而且Reflect内部封装了一系列对对象的底层操作。提供了14个静态方法，其中有一个废弃掉了，剩下13个。这个13个对象的方法的方法名与<a href="https://laceyx.github.io/2021/01/22/proxy/#more">Proxy中对象中处理对象的方法成员是完全一致的</a>。Reflect成员方法就是Proxy处理对象的默认实现。</p>
-<p>在Proxy处理对象中，如果我们没有添加具体的处理方法（比如get/set），那么它的内部这些get/set到底是怎样执行的呢？看个小例子：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  foo: &#39;123&#39;,</span><br><span class="line">  bar: &#39;456&#39;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const proxy &#x3D; new Proxy(obj, &#123;</span><br><span class="line">  &#x2F;&#x2F; 我们在定义get&#x2F;set 这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，</span><br><span class="line">  &#x2F;&#x2F; 最后返回通过Reflect中对应方法调用的结果。</span><br><span class="line">  get(target, property) &#123;</span><br><span class="line">    console.log(&#39;watch login~&#39;); &#x2F;&#x2F;模拟我们调用的js逻辑</span><br><span class="line">    return Reflect.get(target, property)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">console.log(proxy.foo) </span><br></pre></td></tr></table></figure>
-<p>其实Proxy处理对象内部，默认实现的逻辑就是调用了Reflect对象当中所对应的方法。也就是说我们没有定义get方法就等同于是我们定义了一个get方法，然后将参数原封不动传给Reflect的get方法，这个结果是一样的。</p>
-<p>我们在定义get/set这样的逻辑时，更标准的做法是：先去实现自己所需要的js逻辑，最后返回通过Reflect中对应方法调用的结果。</p>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>Reflect</tag>
       </tags>
   </entry>
   <entry>
