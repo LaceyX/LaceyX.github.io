@@ -336,4 +336,98 @@
         <tag>Symbol</tag>
       </tags>
   </entry>
+  <entry>
+    <title>异步编程初识</title>
+    <url>/2021/12/04/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/AsyncCode1/</url>
+    <content><![CDATA[<blockquote>
+<p>单线程 JavaScript 异步方案。本篇讲述异步编程的某些概念，以及需要异步编程方案的原因</p>
+</blockquote>
+<a id="more"></a>
+
+<h3 id="异步编程：单线程-JavaScript-异步方案"><a href="#异步编程：单线程-JavaScript-异步方案" class="headerlink" title="异步编程：单线程 JavaScript 异步方案"></a>异步编程：单线程 JavaScript 异步方案</h3><p>目前主流的JavaScript环境都是以单线程模式去执行的JavaScript代码</p>
+<h4 id="采用单线程模式工作的原因"><a href="#采用单线程模式工作的原因" class="headerlink" title="采用单线程模式工作的原因"></a>采用单线程模式工作的原因</h4><p>与它最早的设计初衷有关，最早JavaScript这门语言就是运行在浏览器端的脚本语言，它的目的就是实现页面中的动态交互，交互的核心就是进行DOM操作，这也就决定了它必须使用单线程模型，否则就会出现很复杂的线程同步问题。</p>
+<p>试想一下，假定我们在JavaScript中同时有多个线程同时工作，其中某一个线程修改了某个DOM元素，而另外一个线程同时又删除了该DOM元素，那此时浏览器就无法明确该以哪个线程的结果为准，为了避免这些线程同步问题。JavaScript一开始就设计了单线程模式工作。</p>
+<h4 id="单线程：JS执行环境中负责执行代码的线程只有一个。"><a href="#单线程：JS执行环境中负责执行代码的线程只有一个。" class="headerlink" title="单线程：JS执行环境中负责执行代码的线程只有一个。"></a>单线程：JS执行环境中负责执行代码的线程只有一个。</h4><ul>
+<li>优点：更安全，更简单</li>
+<li>缺点：如果我们遇到某个特别耗时的任务，那后面的任务都必须去排队等待这个任务的结束。导致整个程序的执行会被拖延，出现假死的情况。</li>
+<li>为了解决耗时任务阻塞执行的这种问题，JavaScript将任务的执行模式分成了两种<ul>
+<li>同步模式（Synchronous）</li>
+<li>异步模式（Asynchronous）</li>
+</ul>
+</li>
+</ul>
+<h3 id="同步模式（Synchronous）"><a href="#同步模式（Synchronous）" class="headerlink" title="同步模式（Synchronous）"></a>同步模式（Synchronous）</h3><p>概念：同步模式指的就是我们代码当中的任务依次执行，那我们后一个任务必须等到前一个任务结束才能开始执行。程序的执行顺序跟我们代码的编写顺序是完全一致的。<br>在单线程情况下，我们大多数任务会以同步模式去执行。</p>
+<p>示例代码：  </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(&#39;global begin&#39;)</span><br><span class="line">function bar () &#123;</span><br><span class="line">  console.log(&#39;bar task&#39;);</span><br><span class="line">&#125;</span><br><span class="line">function foo () &#123;</span><br><span class="line">  console.log(&#39;foo task&#39;);</span><br><span class="line">  bar()</span><br><span class="line">&#125;</span><br><span class="line">foo()</span><br><span class="line">console.log(&#39;global end&#39;)</span><br></pre></td></tr></table></figure>
+<p>在console 中的执行显示  </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">global begin</span><br><span class="line">foo task</span><br><span class="line">bar task</span><br><span class="line">global end</span><br></pre></td></tr></table></figure>
+<h5 id="在调用栈中的执行过程"><a href="#在调用栈中的执行过程" class="headerlink" title="在调用栈中的执行过程"></a>在调用栈中的执行过程</h5><ul>
+<li>默认压入一个匿名的调用（anonymous）：可以理解为把全部的代码放在一个匿名的函数中去执行，然后逐行执行我们的代码</li>
+<li>console.log(‘global begin’)执行，log打印后，然后弹出</li>
+<li>foo()-&gt;console.log(‘foo task’);执行，log打印后，然后弹出 -&gt; bar() -&gt;console.log(‘bar task’);执行，log打印后，</li>
+<li>然后弹出 -&gt; bar函数执行结束，然后弹出 -&gt; foo函数执行结束，然后弹出</li>
+<li>console.log(‘global end’)，执行，log打印，弹出<br>整体代码全部结束，我们的调用栈就被清空掉</li>
+</ul>
+<blockquote>
+<p>这里的调用栈只是一个专业的说法，通俗说，JS在执行引擎中维护了一个正在工作的工作表，记录当前正在做的一些事情，当这个工作表中所有的任务被清空后，这一轮的工作就结束了。</p>
+</blockquote>
+<h5 id="问题："><a href="#问题：" class="headerlink" title="问题："></a>问题：</h5><p>如果其中的某一个任务或者某一行代码，执行时间过长，那后面的任务就会被延迟，我们把这种延迟叫做阻塞。</p>
+<p>这种阻塞于用户而言就是页面就会卡顿，就必须要有异步模式来去解决我们程序当中那些无法避免的耗时操作（例如我们在浏览器中的Ajax操作，或者node端的大文件读写）。</p>
+<h3 id="异步模式（Asynchronous）"><a href="#异步模式（Asynchronous）" class="headerlink" title="异步模式（Asynchronous）"></a>异步模式（Asynchronous）</h3><blockquote>
+<p>特点：不会去等待这个任务的结束才开始下一个任务。对于耗时任务，它都是开启过后就立即往后执行下一个任务，耗时任务的后续逻辑一般会通过回调函数的方式定义。耗时任务完成后会自动执行我们传入的回调函数。</p>
+</blockquote>
+<p>异步模式对于JavaScript非常重要，因为如果没有异步模式，单线程的JavaScript 语言就无法同时处理大量耗时任务。  </p>
+<p>异步模式的代码执行顺序是比较混乱的，示例代码的执行顺序如下</p>
+<p>示例代码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(&#39;global begin&#39;);</span><br><span class="line">setTimeout(function timer1 ()&#123;</span><br><span class="line">  console.log(&#39;timer1 invoke&#39;);</span><br><span class="line">&#125;,1800)</span><br><span class="line">setTimeout(function timer2()&#123;</span><br><span class="line">  console.log(&#39;timer2 invoke&#39;);</span><br><span class="line">  setTimeout(function timerInner()&#123;</span><br><span class="line">      console.log(&#39;inner invoke&#39;)</span><br><span class="line">  &#125;,1000)    </span><br><span class="line">&#125;,1000)</span><br><span class="line">console.log(&#39;global end&#39;);  </span><br></pre></td></tr></table></figure>
+<h5 id="Call-stack"><a href="#Call-stack" class="headerlink" title="Call stack"></a>Call stack</h5><ul>
+<li><p>首先压入一个匿名的全局调用（anonymous）<br>压栈console.log(‘global begin’)，打印后弹出栈<br>setTimeout(timer1)压栈（异步调用，需要关心内部API环境是怎么工作的），setTimeout(timer1)弹出，后面代码继续执行</p>
+</li>
+<li><p>setTimeout(timer2)压栈（异步调用，需要关心内部API环境是怎么工作的），setTimeout(timer2)弹出，后面代码继续执行</p>
+</li>
+<li><p>压栈console.log(‘global end’)，打印后弹出栈。匿名调用已经执行完成，调用栈会被清空</p>
+</li>
+<li><p>( 对于调用栈来说是开启新一轮的执行，执行过程于上面分析的是一致的)</p>
+</li>
+<li><p>将()压入栈，继续执行timer2(),打印，然后弹出栈</p>
+</li>
+<li><p>遇到异步调用，setTimeout(inner)压栈，（异步调用，需要关心内部API环境是怎么工作的），setTimeout(inner)弹出，后面代码继续执行</p>
+</li>
+</ul>
+<p>打印结果如下：  </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console</span><br><span class="line">global begin</span><br><span class="line">global end</span><br><span class="line"></span><br><span class="line">timer2 invoke</span><br><span class="line">timer1 invoke</span><br><span class="line">inner invoke</span><br></pre></td></tr></table></figure>
+<p>Web APIs（内部API环境，这里以web平台举例）</p>
+<ul>
+<li>为timer1 （1.8秒）函数开启了一个计数器（开始倒数），这是单独工作的，并不受当前JS线程影响</li>
+<li>为timer2（1秒）函数又开启一个计数器（开始倒数），这是单独工作的，并不受当前JS线程影响</li>
+<li>timer2倒计时先结束，timer2函数就会放在我们消息队列的第一位，</li>
+<li>tomer1倒计时结束，timer1就会放在消息队列的第二位</li>
+<li>为timerInner(1秒)函数开启了一个计数器（开始倒计时），这是单独工作的，并不受当前JS线程影响</li>
+</ul>
+<h4 id="事件循环和消息队列（Queue）"><a href="#事件循环和消息队列（Queue）" class="headerlink" title="事件循环和消息队列（Queue）"></a>事件循环和消息队列（Queue）</h4><p>event loop开始发挥作用（它只做一件事情：监听调用栈和消息队列，一旦调用栈中所有的任务都结束了，事件循环就会从消息队列中取出第一个回调函数，然后压如到调用栈），只不过此时我们的消息队列是空的，所以执行相当于暂停下来了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">消息队列中： timer2()    timer1() </span><br></pre></td></tr></table></figure>
+<p>当消息队列中发生了变化，事件循环就会监听到，把消息队列中的第一个（timer2）取出来押入我们的调用栈，</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">消息队列中：timer1()      timerInner()</span><br></pre></td></tr></table></figure>
+<p>然后就是不断的重复，直到我们的调用栈和消息队列中都没有需要继续执行的任务了，整体的代码就执行结束了</p>
+<h4 id="理解："><a href="#理解：" class="headerlink" title="理解："></a>理解：</h4><p>调用栈是一个正在执行的工作表，那消息队列就是一个待办的工作表，而js执行引擎就是先去做完调用栈中所有的任务，然后再通过事件循环，从消息队列中在取一个任务出来，继续执行，以此类推。</p>
+<p>我们随时可以往消息队列中放入一些任务，这些任务会排队等候事件循环。以上就是异步调用在JavaScript中的实现过程以及基本原理，整个过程就是通过内部消息队列和事件循环去实现的。</p>
+<h4 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h4><p>这之间并没有事件先后关系，他们各自都有各自的time line，例如我们的计时器，它开始之后就会直接开始倒计时，根本不过管调用栈或队列中是什么情况。这里是便于理解。</p>
+<p>总结如下图</p>
+
+
+<h5 id="解释如下："><a href="#解释如下：" class="headerlink" title="解释如下："></a>解释如下：</h5><p>比如JavaScript线程在某个时刻发起了一个异步调用，然后它紧接着继续执行本轮的其他任务；</p>
+<p>此时异步线程会单独去执行这个异步任务，然后在执行完这个异步任务之后，会将这个异步任务的回调放入消息队列中；</p>
+<p>js主线程它完成所有的任务之后，会依次执行消息队列中的任务。</p>
+<h5 id="注意：-1"><a href="#注意：-1" class="headerlink" title="注意："></a>注意：</h5><p>JavaScript 确实是单线程的，而我们的浏览器不是单线程的。我们通过JavaScript调用的某些内部的API并不是单线程的，例如我们这里的倒时器，那它内部会有一个单独的线程去负责倒数，等时间到了之后，将回调放入消息队列（也就是说这样一个事情它是由一个单独的线程去做的）。</p>
+<p>我们所说的单线程指的是执行我们代码的线程是一个线程。也就是说这些内部的API它们会用单独的线程去执行这些等待的操作。</p>
+<p>我们这里的同步异步，并不是指我们写代码的方式，而是指运行环境提供的API是以同步或异步模式的方式去工作。</p>
+<p>对于同步模式的API的特点就是这个任务执行完，它的代码才会继续往下走（例如console.log()）;对于异步模式的API，就是下达这个任务开启过后的指令，就会继续往下执行，代码是不会在这一行等待任务的结束的（例如setTimeout()）。</p>
+]]></content>
+      <categories>
+        <category>异步编程</category>
+      </categories>
+      <tags>
+        <tag>异步编程</tag>
+      </tags>
+  </entry>
 </search>
