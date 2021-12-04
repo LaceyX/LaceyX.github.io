@@ -338,7 +338,7 @@
   </entry>
   <entry>
     <title>异步编程初识</title>
-    <url>/2021/12/04/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/AsyncCode1/</url>
+    <url>/2021/12/04/AsyncCode/AsyncCode1/</url>
     <content><![CDATA[<blockquote>
 <p>单线程 JavaScript 异步方案。本篇讲述异步编程的某些概念，以及需要异步编程方案的原因</p>
 </blockquote>
@@ -413,7 +413,6 @@
 <p>我们随时可以往消息队列中放入一些任务，这些任务会排队等候事件循环。以上就是异步调用在JavaScript中的实现过程以及基本原理，整个过程就是通过内部消息队列和事件循环去实现的。</p>
 <h5 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h5><p>这之间并没有事件先后关系，他们各自都有各自的time line，例如我们的计时器，它开始之后就会直接开始倒计时，根本不过管调用栈或队列中是什么情况。这里是便于理解。</p>
 <p>总结如下图</p>
-
 
 
 <h5 id="解释如下："><a href="#解释如下：" class="headerlink" title="解释如下："></a>解释如下：</h5><p>比如JavaScript线程在某个时刻发起了一个异步调用，然后它紧接着继续执行本轮的其他任务；</p>
