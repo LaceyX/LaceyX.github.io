@@ -1,63 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>ES6 之 可迭代接口 Iterable</title>
-    <url>/2021/12/02/Iterable/</url>
-    <content><![CDATA[<blockquote>
-<p>为给各种各样的数据结构提供统一的遍历方式，ES6提供了Iterable接口。</p>
-</blockquote>
-<a id="more"></a>
-
-<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
-<p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
-</blockquote>
-<p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
-<blockquote>
-<p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
-</blockquote>
-<p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
-<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：Array、Set、Map等等。</p>
-<p>Array:</p>
-<img src="/2021/12/02/Iterable/iteratorArr.jpg" class title="This is an image">
-
-<p>Set:</p>
-<img src="/2021/12/02/Iterable/iteratorSet.png" class title="This is an image">
-
-<p>Map:</p>
-<img src="/2021/12/02/Iterable/iteratorMap.png" class title="This is an image">
-
-<p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
-<p>那这个Iterable 方法是干什么的呢?</p>
-<p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
-<img src="/2021/12/02/Iterable/iteratorPic.png" class title="This is an image">
-
-
-<blockquote>
-<p>总结一下：所有能直接被 for…of循环遍历的数据类型，它都必须要实现Iterable的接口，就是它在内部都必须要挂载Iterable方法，这个方法要返回一个带有next方法的对象，我们不断调用这个next方法就实现了对数据的遍历。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const set &#x3D; new Set([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]);</span><br><span class="line"></span><br><span class="line">const iterable &#x3D; set[Symbol.iterator]();</span><br><span class="line"></span><br><span class="line">console.log(iterable.next()); &#x2F;&#x2F; &#123; value: &#39;foo&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;bar&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;baz&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="实现可迭代接口Iterable"><a href="#实现可迭代接口Iterable" class="headerlink" title="实现可迭代接口Iterable"></a>实现可迭代接口Iterable</h4><p>如何在ECMAScript中去实现Iterable接口？</p>
-<p>它实际上就是在这个对象中挂载一个Iterable方法，然后在这个方法中去返回一个迭代器对象。挂载一个Iterable方法，主要有三个方面需要满足：</p>
-<blockquote>
-<ol>
-<li>在最外面的对象实现可迭代接口，叫 Iterable，这个接口约定了内部必须要有一个用于返回迭代器的Iterator方法；</li>
-<li>在中间的Iterator返回的对象，它实现了迭代器接口，叫Iterator，这个接口约定的是内部必须 要有一个用于迭代的next方法；</li>
-<li>在next返回的对象，这个对象实现的是迭代结果接口，叫IterationResult。这个接口约定的就是，我们在这个对象的内部必须要有Value属性用来表示当前被迭代到的数据,它的值可以是任意类型，除此之外还必须有done和布尔值，这个属性用来表示迭代有没有结束。</li>
-</ol>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        return &#123;</span><br><span class="line">          value: &#39;xh&#39;,</span><br><span class="line">          done: true</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>让我们实现一个能够被<code>for...of</code>遍历的对象</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  store: [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    let index &#x3D; 0;</span><br><span class="line">    const self &#x3D; this; &#x2F;&#x2F; next函数中的this并不是obj对象</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        const result &#x3D;  &#123;</span><br><span class="line">          value: self.store[index],</span><br><span class="line">          done: index &gt;&#x3D; self.store.length</span><br><span class="line">        &#125;</span><br><span class="line">        index++;</span><br><span class="line">        return result</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (const item of obj) &#123;</span><br><span class="line">  console.log(item); &#x2F;&#x2F; foo bar baz</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>Iterable</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ES6 之 Promise</title>
     <url>/2020/07/29/promise/</url>
     <content><![CDATA[<blockquote>
@@ -152,56 +95,6 @@
       </categories>
       <tags>
         <tag>promise</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ES6 之 Symbol</title>
-    <url>/2021/12/02/symbol/</url>
-    <content><![CDATA[<blockquote>
-<p>Symbol是一种全新的基本数据类型，在未来可能还会添加一个BigInt的原始数据类型，用于存放更长的数字(这个现在处于stage-4阶段，标准化之后，那就有8种原始数据类型)。</p>
-</blockquote>
-<a id="more"></a>
-
-<h4 id="为什么需要Symbol？"><a href="#为什么需要Symbol？" class="headerlink" title="为什么需要Symbol？"></a>为什么需要Symbol？</h4><p>在ES6之前对象的属性名都是字符串，而字符串的属性名是有可能重复的，那重复就会产生冲突。</p>
-<h4 id="实际场景出现的问题"><a href="#实际场景出现的问题" class="headerlink" title="实际场景出现的问题"></a>实际场景出现的问题</h4><p>很多情况下我们大量使用第三方模块，很多时候我们需要扩展第三方模块中的对象，此时我们不知道这个对象中是否存在某个指定的键，如果这时候贸贸然直接扩展，就有可能会产生冲突。</p>
-<h4 id="以前的解决方案"><a href="#以前的解决方案" class="headerlink" title="以前的解决方案"></a>以前的解决方案</h4><p>以前是采用约定的方式，例如，a文件下的键就命名为a_foo,b文件下就命名为b_foo,但是这并没有解决问题，只是规避问题。假如在多人合作开发时有人遵守约定，那就很容易出问题。</p>
-<p>举个约定的栗子(便于展示，这里用 ==== 代表一个单独的文件)：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; share.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">const cache &#x3D; &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;a_foo&#39;] &#x3D; Math.random();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;b_foo&#39;] &#x3D; &#39;123&#39;;</span><br></pre></td></tr></table></figure>
-<p>而ES6为了解决上述问题，提供了一个全新的原始数据类型Symbol</p>
-<h4 id="Symbol的作用"><a href="#Symbol的作用" class="headerlink" title="Symbol的作用"></a>Symbol的作用</h4><p>Symbol的作用是表示一个独一无二的值。在实际应用中，它最主要的作用就是为对象添加独一无二的属性名。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s &#x3D; Symbol();</span><br><span class="line">console.log(s); &#x2F;&#x2F; Symbol()</span><br><span class="line">console.log(typeof s) &#x2F;&#x2F; symbol</span><br><span class="line"></span><br><span class="line">console.log(Symbol() &#x3D;&#x3D;&#x3D; Symbol());&#x2F;&#x2F; false，值是唯一的，我们没有办法去创建一个完全一样的Symbol成员</span><br></pre></td></tr></table></figure>
-<h4 id="Symbol-的使用"><a href="#Symbol-的使用" class="headerlink" title="Symbol 的使用"></a>Symbol 的使用</h4><h5 id="Symbol允许传入字符串参数"><a href="#Symbol允许传入字符串参数" class="headerlink" title="Symbol允许传入字符串参数"></a>Symbol允许传入字符串参数</h5><p>考虑到开发中的调试，Symbol函数允许我们传入字符串作为调试文本。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Symbol(&#39;foo&#39;));&#x2F;&#x2F; Symbol(foo)</span><br><span class="line">console.log(Symbol(&#39;bar&#39;));&#x2F;&#x2F; Symbol(bar)</span><br><span class="line">console.log(Symbol(&#39;baz&#39;));&#x2F;&#x2F; Symbol(baz)</span><br></pre></td></tr></table></figure>
-<h5 id="使用Symbol作为对象属性名"><a href="#使用Symbol作为对象属性名" class="headerlink" title="使用Symbol作为对象属性名"></a>使用Symbol作为对象属性名</h5><p>在ES6及之后，对象允许使用Symbol类型的值作为属性名。现在对象的属性名可以是两种类型：string和Symbol。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;&#125;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;123&#39;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;456&#39;;</span><br><span class="line">console.log(obj); &#x2F;&#x2F; &#123; [Symbol()]: &#39;123&#39;, [Symbol()]: &#39;456&#39; &#125;</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">    [Symbol()]: 123</span><br><span class="line">&#125;</span><br><span class="line">console.log(obj);&#x2F;&#x2F; &#123; [Symbol()]: 123 &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="使用Symbol去创建私有属性"><a href="#使用Symbol去创建私有属性" class="headerlink" title="使用Symbol去创建私有属性"></a>使用Symbol去创建私有属性</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; 使用Symbol去创建私有的属性名</span><br><span class="line">const name &#x3D; Symbol();</span><br><span class="line">const person &#x3D; &#123;</span><br><span class="line">    [name]: &#39;xh&#39;,</span><br><span class="line">    say() &#123;</span><br><span class="line">        console.log(this[name]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; person[Symbol()];&#x2F;&#x2F; 访问不到a.js文件中的person的name属性</span><br><span class="line">person.say();&#x2F;&#x2F; xh</span><br></pre></td></tr></table></figure>
-<h4 id="Symbol补充"><a href="#Symbol补充" class="headerlink" title="Symbol补充"></a>Symbol补充</h4><h5 id="唯一性"><a href="#唯一性" class="headerlink" title="唯一性"></a>唯一性</h5><p>每次通过Symbol函数创建的值一定是唯一值，不管我们传入的描述文本是不是相同的，那每次调用Symbol函数它得到的值都是全新的值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(</span><br><span class="line">  Symbol() &#x3D;&#x3D;&#x3D; Symbol(), &#x2F;&#x2F; false</span><br><span class="line">  Symbol(&#39;foo&#39;) &#x3D;&#x3D;&#x3D; Symbol(&#39;foo&#39;) &#x2F;&#x2F; false</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h5 id="如何在全局复用相同的Symbol值？"><a href="#如何在全局复用相同的Symbol值？" class="headerlink" title="如何在全局复用相同的Symbol值？"></a>如何在全局复用相同的Symbol值？</h5><ul>
-<li>使用全局变量的方式去实现</li>
-<li>使用Symbol类型提供的静态方法（for）去实现<ul>
-<li>使用for方法，这个方法可以接受一个字符串作为参数，相同的字符串就一定会返回相同的Symbol类型的值。这个方法内部维护了一个全局的注册表，为我们的字符串和symbol值提供了一一对应的关系。</li>
-<li><blockquote>
-<p>注意：这个方法内部维护的是字符串和symbol值一一对应的关系，如果我们传入的不是字符串，那这个方法会将其自动转换为字符串。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s1 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">const s2 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">console.log(s1 &#x3D;&#x3D;&#x3D; s2);&#x2F;&#x2F; true</span><br><span class="line"></span><br><span class="line">console.log(</span><br><span class="line">  Symbol.for(&#39;true&#39;) &#x3D;&#x3D;&#x3D; Symbol.for(true)</span><br><span class="line">); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
-<h5 id="Symbol内置常量"><a href="#Symbol内置常量" class="headerlink" title="Symbol内置常量"></a>Symbol内置常量</h5><p>Symbol类型中提供了很多内置Symbol常量，用来去作为内部方法的标识，这些标识符可以让自定义对象去实现一些JS中内置的接口。例如：iterator、hasInstance等等</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 这种symbol（symbol常量）为我们后面为对象实现迭代器时会经常用到</span><br><span class="line">console.log(Symbol.iterator);</span><br><span class="line">console.log(Symbol.hasInstance);</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  &#x2F;&#x2F; 自定义对象的toString标签：可以添加一个特定的成员去标识（使用字符串去添加标识符，可能会跟内部成员产生冲突，ECMAScript要求我们使用Symbol来实现这个标识）</span><br><span class="line">  [Symbol.toStringTag]: &#39;Xobject&#39;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;原本的： [object Object] &#x3D;&#x3D;&gt;叫对象的toString标签</span><br><span class="line">console.log(obj.toString()) &#x2F;&#x2F;修改后的： [object Xobject]</span><br></pre></td></tr></table></figure>
-<h5 id="使用symbol值去作为对象的属性名"><a href="#使用symbol值去作为对象的属性名" class="headerlink" title="使用symbol值去作为对象的属性名"></a>使用symbol值去作为对象的属性名</h5><p>使用symbol值去作为对象的属性名，通过for…of..循环、Object.keys()、JSON.toStringify()序列化，都是获取不到的。这种特性表示Symbol类型特别适合作为对象的私有属性。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol()]: &#39;symbol value&#39;,</span><br><span class="line">  for: &#39;normal value&#39;</span><br><span class="line">&#125;</span><br><span class="line">for (var key in obj) &#123;</span><br><span class="line">  console.log(key); &#x2F;&#x2F; foo</span><br><span class="line">&#125;</span><br><span class="line">console.log(Object.keys(obj));&#x2F;&#x2F; [&#39;foo&#39;]</span><br><span class="line">console.log(JSON.stringify(obj)) &#x2F;&#x2F; &#123;&quot;for&quot;:&quot;normal value&quot;&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="如何获取symbol类型的属性名"><a href="#如何获取symbol类型的属性名" class="headerlink" title="如何获取symbol类型的属性名"></a>如何获取symbol类型的属性名</h5><p>使用Object.getOwnPropertySymbols(obj)方法，作用与Object.keys方法类似。不同的是Object.keys方法只能获取到对象中所有的字符串属性名，而Object.getOwnPropertySymbols(obj)方法，它获取到的全是Symbol属性名。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Object.getOwnPropertySymbols(obj)); &#x2F;&#x2F; [ Symbol() ]</span><br></pre></td></tr></table></figure>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>Symbol</tag>
       </tags>
   </entry>
   <entry>
@@ -310,6 +203,63 @@
       </tags>
   </entry>
   <entry>
+    <title>ES6 之 可迭代接口 Iterable</title>
+    <url>/2021/12/02/Iterable/</url>
+    <content><![CDATA[<blockquote>
+<p>为给各种各样的数据结构提供统一的遍历方式，ES6提供了Iterable接口。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><blockquote>
+<p>在学习ES6的新特性学到<code>for...of</code>的时候，有个问题让我非常困惑，有的资料说<code>for...of</code>循环这种循环方式以后会作为遍历所有数据结构的统一方式,为什么使用<code>for...of</code>遍历普通对象会报错？</p>
+</blockquote>
+<p>原来是ECMAScript能够表示有结构的数据的数据类型越来越多，从最早的数组，对象，现在又增加了Set、Map,而这些又可以结合使用。为了给各种各样的数据结构提供统一遍历方式，ES2015就提供了Iterable接口（可迭代的），例如任意数据类型都有toString方法，那是因为都实现了统一的规格标准（这种统一的规格标准在编程的专业叫法叫接口）,因为普通对象内部没有实现Iterable接口，所以它不能被for…of遍历。</p>
+<blockquote>
+<p>那又为什么说for…of循环可以作为遍历所有数据结构的统一方式？</p>
+</blockquote>
+<p>因为它内部就是去调用被遍历对象的Iterable方法，去得到一个迭代器，从而去遍历内部所有的数据。这也是Iterable接口所约定的内容。换句话说，只要我们的对象也实现了Iterable接口，那就可以实现使用<code>for...of</code>循环去遍历我们的的对象。</p>
+<h4 id="Iterable接口实现的内容"><a href="#Iterable接口实现的内容" class="headerlink" title="Iterable接口实现的内容"></a>Iterable接口实现的内容</h4><p>首先，Iterable接口约定的就是我们对象当中必须要挂载一个叫 Iterable的方法。这里举一些画在Iterable接口的几种数据，比如说：Array、Set、Map等等。</p>
+<p>Array:</p>
+<img src="/2021/12/02/Iterable/iteratorArr.jpg" class title="This is an image">
+
+<p>Set:</p>
+<img src="/2021/12/02/Iterable/iteratorSet.png" class title="This is an image">
+
+<p>Map:</p>
+<img src="/2021/12/02/Iterable/iteratorMap.png" class title="This is an image">
+
+<p>这些数据内部都实现了Iterable接口，所以他们都能被for…of遍历。</p>
+<p>那这个Iterable 方法是干什么的呢?</p>
+<p>在arr<a href>Symbol.iterator</a>调用后会返回一个数组迭代器对象（Array Iterator {}），这个迭代器中维护了一个数据指针，我们每调用一次next，这个指针都会往后移一位，而done属性的作用就是表示我们内部的属性是否全部被遍历完了。</p>
+<img src="/2021/12/02/Iterable/iteratorPic.png" class title="This is an image">
+
+
+<blockquote>
+<p>总结一下：所有能直接被 for…of循环遍历的数据类型，它都必须要实现Iterable的接口，就是它在内部都必须要挂载Iterable方法，这个方法要返回一个带有next方法的对象，我们不断调用这个next方法就实现了对数据的遍历。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const set &#x3D; new Set([&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;]);</span><br><span class="line"></span><br><span class="line">const iterable &#x3D; set[Symbol.iterator]();</span><br><span class="line"></span><br><span class="line">console.log(iterable.next()); &#x2F;&#x2F; &#123; value: &#39;foo&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;bar&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: &#39;baz&#39;, done: false &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br><span class="line">console.log(iterable.next());&#x2F;&#x2F; &#123; value: undefined, done: true &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="实现可迭代接口Iterable"><a href="#实现可迭代接口Iterable" class="headerlink" title="实现可迭代接口Iterable"></a>实现可迭代接口Iterable</h4><p>如何在ECMAScript中去实现Iterable接口？</p>
+<p>它实际上就是在这个对象中挂载一个Iterable方法，然后在这个方法中去返回一个迭代器对象。挂载一个Iterable方法，主要有三个方面需要满足：</p>
+<blockquote>
+<ol>
+<li>在最外面的对象实现可迭代接口，叫 Iterable，这个接口约定了内部必须要有一个用于返回迭代器的Iterator方法；</li>
+<li>在中间的Iterator返回的对象，它实现了迭代器接口，叫Iterator，这个接口约定的是内部必须 要有一个用于迭代的next方法；</li>
+<li>在next返回的对象，这个对象实现的是迭代结果接口，叫IterationResult。这个接口约定的就是，我们在这个对象的内部必须要有Value属性用来表示当前被迭代到的数据,它的值可以是任意类型，除此之外还必须有done和布尔值，这个属性用来表示迭代有没有结束。</li>
+</ol>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        return &#123;</span><br><span class="line">          value: &#39;xh&#39;,</span><br><span class="line">          done: true</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>让我们实现一个能够被<code>for...of</code>遍历的对象</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  store: [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],</span><br><span class="line">  [Symbol.iterator]: function() &#123;</span><br><span class="line">    let index &#x3D; 0;</span><br><span class="line">    const self &#x3D; this; &#x2F;&#x2F; next函数中的this并不是obj对象</span><br><span class="line">    return &#123;</span><br><span class="line">      next:function() &#123;</span><br><span class="line">        const result &#x3D;  &#123;</span><br><span class="line">          value: self.store[index],</span><br><span class="line">          done: index &gt;&#x3D; self.store.length</span><br><span class="line">        &#125;</span><br><span class="line">        index++;</span><br><span class="line">        return result</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">for (const item of obj) &#123;</span><br><span class="line">  console.log(item); &#x2F;&#x2F; foo bar baz</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>Iterable</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ES6 之 Reflect</title>
     <url>/2021/12/02/reflect/</url>
     <content><![CDATA[<blockquote>
@@ -334,6 +284,61 @@
       </categories>
       <tags>
         <tag>Reflect</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/12/08/AsyncCode/AsyncCode2/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>ES6 之 Symbol</title>
+    <url>/2021/12/02/symbol/</url>
+    <content><![CDATA[<blockquote>
+<p>Symbol是一种全新的基本数据类型，在未来可能还会添加一个BigInt的原始数据类型，用于存放更长的数字(这个现在处于stage-4阶段，标准化之后，那就有8种原始数据类型)。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="为什么需要Symbol？"><a href="#为什么需要Symbol？" class="headerlink" title="为什么需要Symbol？"></a>为什么需要Symbol？</h4><p>在ES6之前对象的属性名都是字符串，而字符串的属性名是有可能重复的，那重复就会产生冲突。</p>
+<h4 id="实际场景出现的问题"><a href="#实际场景出现的问题" class="headerlink" title="实际场景出现的问题"></a>实际场景出现的问题</h4><p>很多情况下我们大量使用第三方模块，很多时候我们需要扩展第三方模块中的对象，此时我们不知道这个对象中是否存在某个指定的键，如果这时候贸贸然直接扩展，就有可能会产生冲突。</p>
+<h4 id="以前的解决方案"><a href="#以前的解决方案" class="headerlink" title="以前的解决方案"></a>以前的解决方案</h4><p>以前是采用约定的方式，例如，a文件下的键就命名为a_foo,b文件下就命名为b_foo,但是这并没有解决问题，只是规避问题。假如在多人合作开发时有人遵守约定，那就很容易出问题。</p>
+<p>举个约定的栗子(便于展示，这里用 ==== 代表一个单独的文件)：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; share.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">const cache &#x3D; &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;a_foo&#39;] &#x3D; Math.random();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;b_foo&#39;] &#x3D; &#39;123&#39;;</span><br></pre></td></tr></table></figure>
+<p>而ES6为了解决上述问题，提供了一个全新的原始数据类型Symbol</p>
+<h4 id="Symbol的作用"><a href="#Symbol的作用" class="headerlink" title="Symbol的作用"></a>Symbol的作用</h4><p>Symbol的作用是表示一个独一无二的值。在实际应用中，它最主要的作用就是为对象添加独一无二的属性名。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s &#x3D; Symbol();</span><br><span class="line">console.log(s); &#x2F;&#x2F; Symbol()</span><br><span class="line">console.log(typeof s) &#x2F;&#x2F; symbol</span><br><span class="line"></span><br><span class="line">console.log(Symbol() &#x3D;&#x3D;&#x3D; Symbol());&#x2F;&#x2F; false，值是唯一的，我们没有办法去创建一个完全一样的Symbol成员</span><br></pre></td></tr></table></figure>
+<h4 id="Symbol-的使用"><a href="#Symbol-的使用" class="headerlink" title="Symbol 的使用"></a>Symbol 的使用</h4><h5 id="Symbol允许传入字符串参数"><a href="#Symbol允许传入字符串参数" class="headerlink" title="Symbol允许传入字符串参数"></a>Symbol允许传入字符串参数</h5><p>考虑到开发中的调试，Symbol函数允许我们传入字符串作为调试文本。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Symbol(&#39;foo&#39;));&#x2F;&#x2F; Symbol(foo)</span><br><span class="line">console.log(Symbol(&#39;bar&#39;));&#x2F;&#x2F; Symbol(bar)</span><br><span class="line">console.log(Symbol(&#39;baz&#39;));&#x2F;&#x2F; Symbol(baz)</span><br></pre></td></tr></table></figure>
+<h5 id="使用Symbol作为对象属性名"><a href="#使用Symbol作为对象属性名" class="headerlink" title="使用Symbol作为对象属性名"></a>使用Symbol作为对象属性名</h5><p>在ES6及之后，对象允许使用Symbol类型的值作为属性名。现在对象的属性名可以是两种类型：string和Symbol。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;&#125;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;123&#39;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;456&#39;;</span><br><span class="line">console.log(obj); &#x2F;&#x2F; &#123; [Symbol()]: &#39;123&#39;, [Symbol()]: &#39;456&#39; &#125;</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">    [Symbol()]: 123</span><br><span class="line">&#125;</span><br><span class="line">console.log(obj);&#x2F;&#x2F; &#123; [Symbol()]: 123 &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="使用Symbol去创建私有属性"><a href="#使用Symbol去创建私有属性" class="headerlink" title="使用Symbol去创建私有属性"></a>使用Symbol去创建私有属性</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; 使用Symbol去创建私有的属性名</span><br><span class="line">const name &#x3D; Symbol();</span><br><span class="line">const person &#x3D; &#123;</span><br><span class="line">    [name]: &#39;xh&#39;,</span><br><span class="line">    say() &#123;</span><br><span class="line">        console.log(this[name]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; person[Symbol()];&#x2F;&#x2F; 访问不到a.js文件中的person的name属性</span><br><span class="line">person.say();&#x2F;&#x2F; xh</span><br></pre></td></tr></table></figure>
+<h4 id="Symbol补充"><a href="#Symbol补充" class="headerlink" title="Symbol补充"></a>Symbol补充</h4><h5 id="唯一性"><a href="#唯一性" class="headerlink" title="唯一性"></a>唯一性</h5><p>每次通过Symbol函数创建的值一定是唯一值，不管我们传入的描述文本是不是相同的，那每次调用Symbol函数它得到的值都是全新的值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(</span><br><span class="line">  Symbol() &#x3D;&#x3D;&#x3D; Symbol(), &#x2F;&#x2F; false</span><br><span class="line">  Symbol(&#39;foo&#39;) &#x3D;&#x3D;&#x3D; Symbol(&#39;foo&#39;) &#x2F;&#x2F; false</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h5 id="如何在全局复用相同的Symbol值？"><a href="#如何在全局复用相同的Symbol值？" class="headerlink" title="如何在全局复用相同的Symbol值？"></a>如何在全局复用相同的Symbol值？</h5><ul>
+<li>使用全局变量的方式去实现</li>
+<li>使用Symbol类型提供的静态方法（for）去实现<ul>
+<li>使用for方法，这个方法可以接受一个字符串作为参数，相同的字符串就一定会返回相同的Symbol类型的值。这个方法内部维护了一个全局的注册表，为我们的字符串和symbol值提供了一一对应的关系。</li>
+<li><blockquote>
+<p>注意：这个方法内部维护的是字符串和symbol值一一对应的关系，如果我们传入的不是字符串，那这个方法会将其自动转换为字符串。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s1 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">const s2 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">console.log(s1 &#x3D;&#x3D;&#x3D; s2);&#x2F;&#x2F; true</span><br><span class="line"></span><br><span class="line">console.log(</span><br><span class="line">  Symbol.for(&#39;true&#39;) &#x3D;&#x3D;&#x3D; Symbol.for(true)</span><br><span class="line">); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
+<h5 id="Symbol内置常量"><a href="#Symbol内置常量" class="headerlink" title="Symbol内置常量"></a>Symbol内置常量</h5><p>Symbol类型中提供了很多内置Symbol常量，用来去作为内部方法的标识，这些标识符可以让自定义对象去实现一些JS中内置的接口。例如：iterator、hasInstance等等</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 这种symbol（symbol常量）为我们后面为对象实现迭代器时会经常用到</span><br><span class="line">console.log(Symbol.iterator);</span><br><span class="line">console.log(Symbol.hasInstance);</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  &#x2F;&#x2F; 自定义对象的toString标签：可以添加一个特定的成员去标识（使用字符串去添加标识符，可能会跟内部成员产生冲突，ECMAScript要求我们使用Symbol来实现这个标识）</span><br><span class="line">  [Symbol.toStringTag]: &#39;Xobject&#39;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;原本的： [object Object] &#x3D;&#x3D;&gt;叫对象的toString标签</span><br><span class="line">console.log(obj.toString()) &#x2F;&#x2F;修改后的： [object Xobject]</span><br></pre></td></tr></table></figure>
+<h5 id="使用symbol值去作为对象的属性名"><a href="#使用symbol值去作为对象的属性名" class="headerlink" title="使用symbol值去作为对象的属性名"></a>使用symbol值去作为对象的属性名</h5><p>使用symbol值去作为对象的属性名，通过for…of..循环、Object.keys()、JSON.toStringify()序列化，都是获取不到的。这种特性表示Symbol类型特别适合作为对象的私有属性。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol()]: &#39;symbol value&#39;,</span><br><span class="line">  for: &#39;normal value&#39;</span><br><span class="line">&#125;</span><br><span class="line">for (var key in obj) &#123;</span><br><span class="line">  console.log(key); &#x2F;&#x2F; foo</span><br><span class="line">&#125;</span><br><span class="line">console.log(Object.keys(obj));&#x2F;&#x2F; [&#39;foo&#39;]</span><br><span class="line">console.log(JSON.stringify(obj)) &#x2F;&#x2F; &#123;&quot;for&quot;:&quot;normal value&quot;&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="如何获取symbol类型的属性名"><a href="#如何获取symbol类型的属性名" class="headerlink" title="如何获取symbol类型的属性名"></a>如何获取symbol类型的属性名</h5><p>使用Object.getOwnPropertySymbols(obj)方法，作用与Object.keys方法类似。不同的是Object.keys方法只能获取到对象中所有的字符串属性名，而Object.getOwnPropertySymbols(obj)方法，它获取到的全是Symbol属性名。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Object.getOwnPropertySymbols(obj)); &#x2F;&#x2F; [ Symbol() ]</span><br></pre></td></tr></table></figure>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>Symbol</tag>
       </tags>
   </entry>
   <entry>
@@ -429,10 +434,5 @@
       <tags>
         <tag>异步编程</tag>
       </tags>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2021/12/08/AsyncCode/AsyncCode2/</url>
-    <content><![CDATA[]]></content>
   </entry>
 </search>
