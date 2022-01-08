@@ -58,6 +58,153 @@
       </tags>
   </entry>
   <entry>
+    <title>ES6 之 Promise</title>
+    <url>/2020/07/29/promise/</url>
+    <content><![CDATA[<blockquote>
+<p>Promis是一种更优的异步编程统一方案。<br>它出现的原因是：直接使用传统回调方式去完成复杂的异步流程就无法避免大量的回调函数嵌套，也就是我们所说的回调地狱。为了避免回调地狱的问题，CommonJS社区提出了Promise的规范，目的就是为异步编程提供一种更合理，更强大的统一解决方案。在ES2015中被标准化，成为语言规范。</p>
+</blockquote>
+<a id="more"></a>
+<h4 id="Promise概述"><a href="#Promise概述" class="headerlink" title="Promise概述"></a>Promise概述</h4><p>Promise：所谓Promise就是一个对象，用来表示一个异步任务最终结束之后，它究竟是成功还是失败。就像是内部对外界做出的一个承诺。开始这个承诺处于待定状态（英文叫Pending），最终有可能成功（英文叫Fulfilled），也有可能失败（英文叫Rejected）。结束之后，承诺最终不管是达成还是失败，你都会有相对应的反应。也就是在承诺状态确定之后，都会有相对应的任务会被自动执行。比如Ajax请求，请求成功就调onFulfilled回调，请求失败就调onRejected回调。</p>
+<p>特点：一旦明确了结果过后，就不可能在发生改变</p>
+<img src="/2020/07/29/promise/promiseStates.png" class title="This is an promiseStates image">
+
+<h4 id="Promise基本用法"><a href="#Promise基本用法" class="headerlink" title="Promise基本用法"></a>Promise基本用法</h4><p>Promise是ES2015提供的一个全局类型。</p>
+<p>这个函数在构造Promise中被同步执行，这里用于“兑现”承诺。一般我们将异步任务操作的结果通过resolve的参数传递出去，这个promise对象的状态会修改为fulfilled（成功）；reject用来传递失败的，这个promise对象的状态会修改为rejected（失败）。</p>
+<p>因为Promise的状态一般确定了就不能修改了，所以在这个函数中只能调用这二者中其一。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const promise &#x3D; new Promise(function(resolve,reject) &#123;</span><br><span class="line">    resolve(100);&#x2F;&#x2F;承诺达成</span><br><span class="line">    &#x2F;&#x2F; 失败的参数，一般我们传递失败的对象用来表示这个承诺为什么失败</span><br><span class="line">    reject(new Error(&#39;promise reject&#39;));&#x2F;&#x2F; 承诺失败</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>即便我们的promise中，没有任何的异步操作，then方法中指定的回调函数仍然会进入到回调队列中排队。也就是说，等待这里同步代码全部执行完了，then方法中的才会执行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">promise.then(function(value) &#123;&#x2F;&#x2F; onFulfilled回调函数</span><br><span class="line">  console.log(&#39;resolved&#39;, value);</span><br><span class="line">&#125;,function() &#123; &#x2F;&#x2F; onRejcted回调函数</span><br><span class="line">  console.log(&#39;rejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">console.log(&#39;end&#39;);</span><br></pre></td></tr></table></figure>
+<p>调用结果为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">end</span><br><span class="line">resolved 100</span><br></pre></td></tr></table></figure>
+<h4 id="Promise使用案例"><a href="#Promise使用案例" class="headerlink" title="Promise使用案例"></a>Promise使用案例</h4><p>使用Promise封装Ajax</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">function ajax(url) &#123;</span><br><span class="line">  return new Promise(function (resolve, reject) &#123;</span><br><span class="line">    var xhr &#x3D; new XMLHttpRequest();</span><br><span class="line">    xhr.open(&quot;GET&quot;, url); &#x2F;&#x2F;设置请求方式与请求地址</span><br><span class="line">    &#x2F;&#x2F;设置请求返回的类型为json，这样请求完成返回的数据就不是字符串，而是json对象，es2015新特性</span><br><span class="line">    xhr.responseType &#x3D; &quot;json&quot;;</span><br><span class="line">    &#x2F;&#x2F; 请求完成之后（readyState&#x3D;4），触发的事件，html5添加的新事件</span><br><span class="line">    xhr.onload &#x3D; function () &#123;</span><br><span class="line">      if(this.status &#x3D;&#x3D;&#x3D; 200) &#123;</span><br><span class="line">        resolve(this.response);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        reject(new Error(this.statusText));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    xhr.send();</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;).then(function(res) &#123;</span><br><span class="line">  console.log(res);</span><br><span class="line">&#125;,function(error) &#123;</span><br><span class="line">  console.log(error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="Promise常见误区"><a href="#Promise常见误区" class="headerlink" title="Promise常见误区"></a>Promise常见误区</h4><p>通过前面的演示发现，从表象上来看Promise的本质也就是使用回调函数方式去定义异步任务结束后所需要执行的任务。只不过这里的回调函数是通过then方法传递进去的，只不过promise将我们的回调分成了两种：成功过后的回调（onFulfilled），失败过后的回调（onRejected）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function onFulfilledc(value) &#123;</span><br><span class="line">  console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;,function onReject () &#123;</span><br><span class="line">  console.log(&#39;onRejected&#39;, error)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>嵌套使用的方式是使用Promise最常见的错误。错误使用示例</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&quot;&#x2F;api&#x2F;urls.json&quot;).then(function (urls) &#123;</span><br><span class="line">  ajax(urls.users).then(function(users)&#123;</span><br><span class="line">    ajax(urls.users).then(function(users)&#123;</span><br><span class="line">      ajax(urls.users).then(function(users)&#123;</span><br><span class="line">        ajax(urls.users).then(function(users)&#123;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>正确做法：借助于Promise.then方法链式调用的特点，尽可能保证异步任务的扁平化</p>
+</blockquote>
+<h4 id="Promise链式调用"><a href="#Promise链式调用" class="headerlink" title="Promise链式调用"></a>Promise链式调用</h4><p>Promise的链式调用能最大程度的避免回调嵌套。</p>
+<ul>
+<li>特点：<ul>
+<li>Promise对象的then方法会返回一个全新的Promise对象，所以我们可以使用链式调用的方式添加then方法。</li>
+<li>后面的then方法就是在为上一个then返回的Promise注册回调。</li>
+<li>前面then方法中回调函数的返回值会作为后面then方法回调的参数。</li>
+<li>如果回调中返回的是Promise对象，那后面then方法的回调会等待这个promise的结束。也就是说后面的promise方法，也就是为我们返回的promise对象，去注册了对应的回调。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var promise &#x3D; ajax(&#39;&#x2F;api&#x2F;users.json&#39;);</span><br><span class="line">var promise2 &#x3D; promise.then( &#x2F;&#x2F;then方法作用：为promise对象，去添加状态明确后的回调函数</span><br><span class="line">  function onFulfilled (value) &#123;&#x2F;&#x2F; 成功后的回调</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">  &#125;,</span><br><span class="line">  function onRejected(error)&#123;&#x2F;&#x2F; 失败后的回调，可省略</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br><span class="line">console.log(promise2 &#x3D;&#x3D;&#x3D; promise); &#x2F;&#x2F; false 返回的是一个全新的promise对象</span><br></pre></td></tr></table></figure>
+<p>返回一个全新Promise对象的目的是为了实现一个promise链，一个承诺结束之后，返回一个新的承诺，每个承诺都可以负责一个异步任务相互之间没什么影响。意味着，如果我们不断调用链式then方法，这里的每一个then方法实际上是为了上一个then方法返回的promise对象去添加状态明确后的回调</p>
+<p>如果我们返回的不是一个promise而是一个普通的值，这个值就会作为这个then方法返回的这个promise中的值，在下一个then方法接收的回调参数实际上拿到就是这个值，若我们没有返回任何值，那默认返回就是undefined。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(1111);</span><br><span class="line">  &#x2F;&#x2F; 在回调中手动返回一个promise对象，那下一个then方法实际上是为这个promise对象去添加状态明确过后的回调。可以避免不必要的回调嵌套</span><br><span class="line">  &#x2F;&#x2F; return ajax(&#39;api&#x2F;urls.json&#39;);&#x2F;&#x2F; 意思是：这里的ajax调用之后</span><br><span class="line">&#125;)  &#x2F;&#x2F; &#x3D;&gt; Promise</span><br><span class="line">.then(function(value) &#123;&#x2F;&#x2F; 会自动执行这个方法中的回调</span><br><span class="line">  console.log(2222);</span><br><span class="line">  console.log(value);</span><br><span class="line">&#125;)  &#x2F;&#x2F; &#x3D;&gt; Promise</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(3333);</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(4444);</span><br><span class="line">  return &#39;foo&#39;;</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(5555);</span><br><span class="line">  console.log(value); &#x2F;&#x2F; foo</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>如果有多个连续的任务，我们就可以使用这种链式调用的方式去避免回调的嵌套，从而尽量保证我们的代码的扁平化。</p>
+<h4 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h4><p>处理异常的两种方式：</p>
+<ol>
+<li>通过then方法第二个参数去指定的失败的回调函数;</li>
+<li>用catch方法去指定失败回调。</li>
+</ol>
+<h5 id="通过then方法第二个参数去指定的失败的回调函数"><a href="#通过then方法第二个参数去指定的失败的回调函数" class="headerlink" title="通过then方法第二个参数去指定的失败的回调函数"></a>通过then方法第二个参数去指定的失败的回调函数</h5><p>onRejected回调实际上是为promise中的异常去做一些处理，在promise失败或者出现异常时，它都会被执行。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;,function onRejected(error) &#123;</span><br><span class="line">    &#x2F;&#x2F; promise 的结果失败，就会调用这个onRejected回调函数在promise执行过程中出现了异常，或者我们手动抛出异常也会执行这个回调函数</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h5 id="用catch方法去指定失败回调"><a href="#用catch方法去指定失败回调" class="headerlink" title="用catch方法去指定失败回调"></a>用catch方法去指定失败回调</h5><p>用catch方法去指定失败回调更为常见，因为这种方式更适合链式调用。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;)</span><br><span class="line">.catch(function onRejcted(error) &#123;</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line">&#x2F;&#x2F; 这里的catch实际上时then方法的别名，因为我们调用它，相当于调用了then方法，不过第一个参数传递的是undefined，第二个是onRejected回调函数</span><br><span class="line"></span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;)</span><br><span class="line">.then(undefined, function onRejcted(error) &#123;</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h5 id="这两种方式的差异"><a href="#这两种方式的差异" class="headerlink" title="这两种方式的差异"></a>这两种方式的差异</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 两者的差异对比</span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">    return ajax(&#39;error-url&#39;);</span><br><span class="line">&#125;, function onRejcted(error) &#123; &#x2F;&#x2F; 没有捕获到 ajax(&#39;error-url&#39;) 发生的异常</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users11.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">    return ajax(&#39;error-url&#39;);</span><br><span class="line">&#125;) &#x2F;&#x2F; &#x3D;&gt; Promsie &#123;&#125;</span><br><span class="line">.catch(function onRejcted(error) &#123; </span><br><span class="line">  &#x2F;&#x2F; 可以正常捕获到 ajax(&#39;error-url&#39;) 发生的异常。原因：我们这个失败回调，它是注册在上一个（也就是then方法返回的）promise对象上</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>那为什么会出现上面那种情况呢？</p>
+<ul>
+<li>因为每个then方法它返回的都是一个全新的promise对象，也就是说，我们在后面用链式调用的方式，调用的catch实际上是给前面的then方法返回的promise对象去指定失败回调，并不是直接去给第一个promise对象所指定的。只不过因为这是同一个promise链条，那前面promise上的异常会一直往后传递，所以我们在这里才能捕获到第一个promise中的异常。</li>
+<li>而通过then方法第二个参数去指定的失败的回调函数，它只是给第一个promise对象指定的，也就是说它只能捕获到这个promise对象的异常。</li>
+</ul>
+</li>
+<li><p>具体表象上的差异</p>
+<ul>
+<li>如果我们在then方法中返回了第二个promise，而且这个promise在执行中出现了异常，那我们使用then方法的第二个参数注册的回调，它是捕获不到第二个promise的异常的，因为它只是给第一个promise注册的失败回调。</li>
+<li>所以对于链式调用的情况下，建议使用第二种（catch）方式，去分开指定成功回调和失败回调。因为promise链条上任何一个异常都会被一直向后传递直至被捕获。也就是说，这种方式更像是为整个promise链条注册的失败回调，相对说更通用。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Promise-静态方法"><a href="#Promise-静态方法" class="headerlink" title="Promise 静态方法"></a>Promise 静态方法</h4><h5 id="Promise-resolve"><a href="#Promise-resolve" class="headerlink" title="Promise.resolve()"></a>Promise.resolve()</h5><p>Promise.resolve()的作用：快速将一个值转化为promise对象。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.resolve(&#39;foo&#39;)&#x2F;&#x2F;直接返回一个状态为fulfilled的promise对象,这个&#39;foo&#39;就会作为这个promise对象所返回的值</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">    console.log(value);&#x2F;&#x2F; foo</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 上面等价于下面的</span><br><span class="line">new Promise(function(resolve, reject)&#123;</span><br><span class="line">    resolve(&#39;foo&#39;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>Promise.resolve方法如果接收到的是另一个promise对象，这个promise对象则会原样返回，也就是我们用Promise.resolve去包裹一个promise，得到的是被包裹的那个promise。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var promise &#x3D; ajax(&#39;&#x2F;api&#x2F;users.json&#39;);</span><br><span class="line">var promise2 &#x3D; Promise.resolve(promise);</span><br><span class="line">console.log(promise &#x3D;&#x3D;&#x3D; promise2); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
+<p>若我们传入的是一个对象，这个对象也有与promise一样的then方法，这样的对象也可以作为一个promise对象被执行，在后面的then方法中也能拿到这里所对应传入的值。</p>
+<p>这种带有then方法的对象实现了thenable接口，也就是说它是一个可以被then的对象。支持这种对象的原因，是因为在promise没有普及之前，我们都是使用第三方库去实现promise，如果我们想将第三方的promise对象换成原生的promise，就可以借助这样的机制，因为在第三方promise对象中也有相同的这种then方法，那就可以通过Promise.resolve将其转换成原生的promise对象。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.resolve(&#123;</span><br><span class="line">  then:function(onFulfilled, onRejected)&#123;</span><br><span class="line">      onFulfilled(&#39;foo&#39;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value)&#123;</span><br><span class="line">    console.log(value);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h5 id="Promise-reject"><a href="#Promise-reject" class="headerlink" title="Promise.reject()"></a>Promise.reject()</h5><p>Promise.resolve()的作用：快速创建一个失败的promise对象。它的参数，无论我们传入什么参数，都会作为promise失败的理由（失败的原因）。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.reject(new Error(&#39;rejected&#39;))</span><br><span class="line">.catch(function(error)&#123;</span><br><span class="line">    console.log(error);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">Promise.reject(&#39;anything&#39;)</span><br><span class="line">.catch(function(error)&#123;</span><br><span class="line">    console.log(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="Promise-并行执行"><a href="#Promise-并行执行" class="headerlink" title="Promise 并行执行"></a>Promise 并行执行</h4><p>前面的操作都是通过promise去串联多个异步任务，也就是一个任务之后，再去开启下一个任务。相对于传统的回调方式Promise提供了更扁平的异步体验。如果需要同时并行执行多个异步任务（比如请求多个接口，且他们之间没有相互依赖），promise也可以提供更完善的体验。</p>
+<h5 id="Promise-all"><a href="#Promise-all" class="headerlink" title="Promise.all()"></a>Promise.all()</h5><p>Promise.all()的作用：可以将多个Promise合并为一个Promise统一去管理。</p>
+<p>Promise.all():参数是数组，里面是一个个promise对象（每个promise对象可看作是一个异步任务），返回一个全新的promise对象。当内部所有的promise完成之后，我们所返回的这个全新的promise才会完成，此时这个promise对象拿到的结果就是数组，这个数组包含每个异步任务执行后的结果。</p>
+<blockquote>
+<p>注意：在这个任务过程中，只有这里面的任务都成功结束了，这个新的promise才会成功结束，如果这里有其中一个任务结束了，那这个promise就会以失败结束。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; Promise.all()能够很好的处理这种并行的异步请求</span><br><span class="line">var promise &#x3D; Promise.all([</span><br><span class="line">    ajax(&#39;&#x2F;api&#x2F;users.json&#39;),</span><br><span class="line">    ajax(&#39;&#x2F;api&#x2F;posts.json&#39;)</span><br><span class="line">]);</span><br><span class="line">promise.then(function (values)&#123;</span><br><span class="line">    console.log(values); &#x2F;&#x2F; (2) [Array(2), Array(2)]</span><br><span class="line">&#125;).catch(function (error)&#123;</span><br><span class="line">    console.log(error); &#x2F;&#x2F; GET http:&#x2F;&#x2F;localhost:8080&#x2F;api&#x2F;posts11.json 404 (Not Found)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>综合使用串联和并联这两种方式。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;urls.json&#39;)</span><br><span class="line">.then(value &#x3D;&gt; &#123;</span><br><span class="line">    const urls &#x3D; Object.values(value);</span><br><span class="line">    const task &#x3D; urls.map(url &#x3D;&gt; ajax(url));&#x2F;&#x2F; 返回的task是promise对象数组</span><br><span class="line">    return Promise.all(task);</span><br><span class="line">&#125;)</span><br><span class="line">.then(values &#x3D;&gt; &#123;</span><br><span class="line">    console.log(values);&#x2F;&#x2F; (2) [Array(2), Array(2)]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h5 id="Promise-race"><a href="#Promise-race" class="headerlink" title="Promise.race()"></a>Promise.race()</h5><p>Promis.race()的作用：也可以将多个Promise对象组合成一个全新的Promise对象。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const request &#x3D; ajax(&#39;&#x2F;api&#x2F;posts.json&#39;)</span><br><span class="line">const timeout &#x3D; new Promise((resolve, reject) &#x3D;&gt; &#123;</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">        reject(new Error(&#39;timeout&#39;))</span><br><span class="line">    &#125;, 500);</span><br><span class="line">&#125;)</span><br><span class="line">&#x2F;&#x2F; 效果：如果500毫秒内请求完成了，就可以正常得到响应结果，如果500毫秒之后，请求就无法将请求返回因为在500毫秒后我们的第二个promise会以失败方式结束，而race方法就是以第一个结束的promise为准</span><br><span class="line">Promise.race([</span><br><span class="line">  request,</span><br><span class="line">  timeout</span><br><span class="line">])</span><br><span class="line">.then(value &#x3D;&gt; &#123;</span><br><span class="line">  console.log(value) &#x2F;&#x2F; Array(2)</span><br><span class="line">&#125;)</span><br><span class="line">.catch(error &#x3D;&gt; &#123;</span><br><span class="line">  console.log(error) &#x2F;&#x2F; Error: timeout</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h5 id="Promise-all-）与-Promise-race-的区别"><a href="#Promise-all-）与-Promise-race-的区别" class="headerlink" title="Promise.all(）与 Promise.race()的区别"></a>Promise.all(）与 Promise.race()的区别</h5><p>Promose.all()等待所有的任务结束后才会结束（所有的任务成功结束，才会成功结束），Promise.race()只会等待第一个结束的任务，也就是说只要任何一个任务完成了，那我们这个返回的新的Promise也就会完成。</p>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>promise</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ES6 之 Symbol</title>
+    <url>/2021/12/02/symbol/</url>
+    <content><![CDATA[<blockquote>
+<p>Symbol是一种全新的基本数据类型，在未来可能还会添加一个BigInt的原始数据类型，用于存放更长的数字(这个现在处于stage-4阶段，标准化之后，那就有8种原始数据类型)。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="为什么需要Symbol？"><a href="#为什么需要Symbol？" class="headerlink" title="为什么需要Symbol？"></a>为什么需要Symbol？</h4><p>在ES6之前对象的属性名都是字符串，而字符串的属性名是有可能重复的，那重复就会产生冲突。</p>
+<h4 id="实际场景出现的问题"><a href="#实际场景出现的问题" class="headerlink" title="实际场景出现的问题"></a>实际场景出现的问题</h4><p>很多情况下我们大量使用第三方模块，很多时候我们需要扩展第三方模块中的对象，此时我们不知道这个对象中是否存在某个指定的键，如果这时候贸贸然直接扩展，就有可能会产生冲突。</p>
+<h4 id="以前的解决方案"><a href="#以前的解决方案" class="headerlink" title="以前的解决方案"></a>以前的解决方案</h4><p>以前是采用约定的方式，例如，a文件下的键就命名为a_foo,b文件下就命名为b_foo,但是这并没有解决问题，只是规避问题。假如在多人合作开发时有人遵守约定，那就很容易出问题。</p>
+<p>举个约定的栗子(便于展示，这里用 ==== 代表一个单独的文件)：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; share.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">const cache &#x3D; &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;a_foo&#39;] &#x3D; Math.random();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;b_foo&#39;] &#x3D; &#39;123&#39;;</span><br></pre></td></tr></table></figure>
+<p>而ES6为了解决上述问题，提供了一个全新的原始数据类型Symbol</p>
+<h4 id="Symbol的作用"><a href="#Symbol的作用" class="headerlink" title="Symbol的作用"></a>Symbol的作用</h4><p>Symbol的作用是表示一个独一无二的值。在实际应用中，它最主要的作用就是为对象添加独一无二的属性名。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s &#x3D; Symbol();</span><br><span class="line">console.log(s); &#x2F;&#x2F; Symbol()</span><br><span class="line">console.log(typeof s) &#x2F;&#x2F; symbol</span><br><span class="line"></span><br><span class="line">console.log(Symbol() &#x3D;&#x3D;&#x3D; Symbol());&#x2F;&#x2F; false，值是唯一的，我们没有办法去创建一个完全一样的Symbol成员</span><br></pre></td></tr></table></figure>
+<h4 id="Symbol-的使用"><a href="#Symbol-的使用" class="headerlink" title="Symbol 的使用"></a>Symbol 的使用</h4><h5 id="Symbol允许传入字符串参数"><a href="#Symbol允许传入字符串参数" class="headerlink" title="Symbol允许传入字符串参数"></a>Symbol允许传入字符串参数</h5><p>考虑到开发中的调试，Symbol函数允许我们传入字符串作为调试文本。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Symbol(&#39;foo&#39;));&#x2F;&#x2F; Symbol(foo)</span><br><span class="line">console.log(Symbol(&#39;bar&#39;));&#x2F;&#x2F; Symbol(bar)</span><br><span class="line">console.log(Symbol(&#39;baz&#39;));&#x2F;&#x2F; Symbol(baz)</span><br></pre></td></tr></table></figure>
+<h5 id="使用Symbol作为对象属性名"><a href="#使用Symbol作为对象属性名" class="headerlink" title="使用Symbol作为对象属性名"></a>使用Symbol作为对象属性名</h5><p>在ES6及之后，对象允许使用Symbol类型的值作为属性名。现在对象的属性名可以是两种类型：string和Symbol。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;&#125;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;123&#39;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;456&#39;;</span><br><span class="line">console.log(obj); &#x2F;&#x2F; &#123; [Symbol()]: &#39;123&#39;, [Symbol()]: &#39;456&#39; &#125;</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">    [Symbol()]: 123</span><br><span class="line">&#125;</span><br><span class="line">console.log(obj);&#x2F;&#x2F; &#123; [Symbol()]: 123 &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="使用Symbol去创建私有属性"><a href="#使用Symbol去创建私有属性" class="headerlink" title="使用Symbol去创建私有属性"></a>使用Symbol去创建私有属性</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; 使用Symbol去创建私有的属性名</span><br><span class="line">const name &#x3D; Symbol();</span><br><span class="line">const person &#x3D; &#123;</span><br><span class="line">    [name]: &#39;xh&#39;,</span><br><span class="line">    say() &#123;</span><br><span class="line">        console.log(this[name]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; person[Symbol()];&#x2F;&#x2F; 访问不到a.js文件中的person的name属性</span><br><span class="line">person.say();&#x2F;&#x2F; xh</span><br></pre></td></tr></table></figure>
+<h4 id="Symbol补充"><a href="#Symbol补充" class="headerlink" title="Symbol补充"></a>Symbol补充</h4><h5 id="唯一性"><a href="#唯一性" class="headerlink" title="唯一性"></a>唯一性</h5><p>每次通过Symbol函数创建的值一定是唯一值，不管我们传入的描述文本是不是相同的，那每次调用Symbol函数它得到的值都是全新的值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(</span><br><span class="line">  Symbol() &#x3D;&#x3D;&#x3D; Symbol(), &#x2F;&#x2F; false</span><br><span class="line">  Symbol(&#39;foo&#39;) &#x3D;&#x3D;&#x3D; Symbol(&#39;foo&#39;) &#x2F;&#x2F; false</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h5 id="如何在全局复用相同的Symbol值？"><a href="#如何在全局复用相同的Symbol值？" class="headerlink" title="如何在全局复用相同的Symbol值？"></a>如何在全局复用相同的Symbol值？</h5><ul>
+<li>使用全局变量的方式去实现</li>
+<li>使用Symbol类型提供的静态方法（for）去实现<ul>
+<li>使用for方法，这个方法可以接受一个字符串作为参数，相同的字符串就一定会返回相同的Symbol类型的值。这个方法内部维护了一个全局的注册表，为我们的字符串和symbol值提供了一一对应的关系。</li>
+<li><blockquote>
+<p>注意：这个方法内部维护的是字符串和symbol值一一对应的关系，如果我们传入的不是字符串，那这个方法会将其自动转换为字符串。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s1 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">const s2 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">console.log(s1 &#x3D;&#x3D;&#x3D; s2);&#x2F;&#x2F; true</span><br><span class="line"></span><br><span class="line">console.log(</span><br><span class="line">  Symbol.for(&#39;true&#39;) &#x3D;&#x3D;&#x3D; Symbol.for(true)</span><br><span class="line">); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
+<h5 id="Symbol内置常量"><a href="#Symbol内置常量" class="headerlink" title="Symbol内置常量"></a>Symbol内置常量</h5><p>Symbol类型中提供了很多内置Symbol常量，用来去作为内部方法的标识，这些标识符可以让自定义对象去实现一些JS中内置的接口。例如：iterator、hasInstance等等</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 这种symbol（symbol常量）为我们后面为对象实现迭代器时会经常用到</span><br><span class="line">console.log(Symbol.iterator);</span><br><span class="line">console.log(Symbol.hasInstance);</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  &#x2F;&#x2F; 自定义对象的toString标签：可以添加一个特定的成员去标识（使用字符串去添加标识符，可能会跟内部成员产生冲突，ECMAScript要求我们使用Symbol来实现这个标识）</span><br><span class="line">  [Symbol.toStringTag]: &#39;Xobject&#39;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;原本的： [object Object] &#x3D;&#x3D;&gt;叫对象的toString标签</span><br><span class="line">console.log(obj.toString()) &#x2F;&#x2F;修改后的： [object Xobject]</span><br></pre></td></tr></table></figure>
+<h5 id="使用symbol值去作为对象的属性名"><a href="#使用symbol值去作为对象的属性名" class="headerlink" title="使用symbol值去作为对象的属性名"></a>使用symbol值去作为对象的属性名</h5><p>使用symbol值去作为对象的属性名，通过for…of..循环、Object.keys()、JSON.toStringify()序列化，都是获取不到的。这种特性表示Symbol类型特别适合作为对象的私有属性。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol()]: &#39;symbol value&#39;,</span><br><span class="line">  for: &#39;normal value&#39;</span><br><span class="line">&#125;</span><br><span class="line">for (var key in obj) &#123;</span><br><span class="line">  console.log(key); &#x2F;&#x2F; foo</span><br><span class="line">&#125;</span><br><span class="line">console.log(Object.keys(obj));&#x2F;&#x2F; [&#39;foo&#39;]</span><br><span class="line">console.log(JSON.stringify(obj)) &#x2F;&#x2F; &#123;&quot;for&quot;:&quot;normal value&quot;&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="如何获取symbol类型的属性名"><a href="#如何获取symbol类型的属性名" class="headerlink" title="如何获取symbol类型的属性名"></a>如何获取symbol类型的属性名</h5><p>使用Object.getOwnPropertySymbols(obj)方法，作用与Object.keys方法类似。不同的是Object.keys方法只能获取到对象中所有的字符串属性名，而Object.getOwnPropertySymbols(obj)方法，它获取到的全是Symbol属性名。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Object.getOwnPropertySymbols(obj)); &#x2F;&#x2F; [ Symbol() ]</span><br></pre></td></tr></table></figure>
+<p>感谢您的阅读～</p>
+]]></content>
+      <categories>
+        <category>ES6+系列</category>
+      </categories>
+      <tags>
+        <tag>Symbol</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ES6 之 Proxy使用</title>
     <url>/2021/12/02/proxy/</url>
     <content><![CDATA[<blockquote>
@@ -163,103 +310,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ES6 之 Promise</title>
-    <url>/2020/07/29/promise/</url>
-    <content><![CDATA[<blockquote>
-<p>Promis是一种更优的异步编程统一方案。<br>它出现的原因是：直接使用传统回调方式去完成复杂的异步流程就无法避免大量的回调函数嵌套，也就是我们所说的回调地狱。为了避免回调地狱的问题，CommonJS社区提出了Promise的规范，目的就是为异步编程提供一种更合理，更强大的统一解决方案。在ES2015中被标准化，成为语言规范。</p>
-</blockquote>
-<a id="more"></a>
-<h4 id="Promise概述"><a href="#Promise概述" class="headerlink" title="Promise概述"></a>Promise概述</h4><p>Promise：所谓Promise就是一个对象，用来表示一个异步任务最终结束之后，它究竟是成功还是失败。就像是内部对外界做出的一个承诺。开始这个承诺处于待定状态（英文叫Pending），最终有可能成功（英文叫Fulfilled），也有可能失败（英文叫Rejected）。结束之后，承诺最终不管是达成还是失败，你都会有相对应的反应。也就是在承诺状态确定之后，都会有相对应的任务会被自动执行。比如Ajax请求，请求成功就调onFulfilled回调，请求失败就调onRejected回调。</p>
-<p>特点：一旦明确了结果过后，就不可能在发生改变</p>
-<img src="/2020/07/29/promise/promiseStates.png" class title="This is an promiseStates image">
-
-<h4 id="Promise基本用法"><a href="#Promise基本用法" class="headerlink" title="Promise基本用法"></a>Promise基本用法</h4><p>Promise是ES2015提供的一个全局类型。</p>
-<p>这个函数在构造Promise中被同步执行，这里用于“兑现”承诺。一般我们将异步任务操作的结果通过resolve的参数传递出去，这个promise对象的状态会修改为fulfilled（成功）；reject用来传递失败的，这个promise对象的状态会修改为rejected（失败）。</p>
-<p>因为Promise的状态一般确定了就不能修改了，所以在这个函数中只能调用这二者中其一。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const promise &#x3D; new Promise(function(resolve,reject) &#123;</span><br><span class="line">    resolve(100);&#x2F;&#x2F;承诺达成</span><br><span class="line">    &#x2F;&#x2F; 失败的参数，一般我们传递失败的对象用来表示这个承诺为什么失败</span><br><span class="line">    reject(new Error(&#39;promise reject&#39;));&#x2F;&#x2F; 承诺失败</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>即便我们的promise中，没有任何的异步操作，then方法中指定的回调函数仍然会进入到回调队列中排队。也就是说，等待这里同步代码全部执行完了，then方法中的才会执行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">promise.then(function(value) &#123;&#x2F;&#x2F; onFulfilled回调函数</span><br><span class="line">  console.log(&#39;resolved&#39;, value);</span><br><span class="line">&#125;,function() &#123; &#x2F;&#x2F; onRejcted回调函数</span><br><span class="line">  console.log(&#39;rejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">console.log(&#39;end&#39;);</span><br></pre></td></tr></table></figure>
-<p>调用结果为</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">end</span><br><span class="line">resolved 100</span><br></pre></td></tr></table></figure>
-<h4 id="Promise使用案例"><a href="#Promise使用案例" class="headerlink" title="Promise使用案例"></a>Promise使用案例</h4><p>使用Promise封装Ajax</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">function ajax(url) &#123;</span><br><span class="line">  return new Promise(function (resolve, reject) &#123;</span><br><span class="line">    var xhr &#x3D; new XMLHttpRequest();</span><br><span class="line">    xhr.open(&quot;GET&quot;, url); &#x2F;&#x2F;设置请求方式与请求地址</span><br><span class="line">    &#x2F;&#x2F;设置请求返回的类型为json，这样请求完成返回的数据就不是字符串，而是json对象，es2015新特性</span><br><span class="line">    xhr.responseType &#x3D; &quot;json&quot;;</span><br><span class="line">    &#x2F;&#x2F; 请求完成之后（readyState&#x3D;4），触发的事件，html5添加的新事件</span><br><span class="line">    xhr.onload &#x3D; function () &#123;</span><br><span class="line">      if(this.status &#x3D;&#x3D;&#x3D; 200) &#123;</span><br><span class="line">        resolve(this.response);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        reject(new Error(this.statusText));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    xhr.send();</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;).then(function(res) &#123;</span><br><span class="line">  console.log(res);</span><br><span class="line">&#125;,function(error) &#123;</span><br><span class="line">  console.log(error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<h4 id="Promise常见误区"><a href="#Promise常见误区" class="headerlink" title="Promise常见误区"></a>Promise常见误区</h4><p>通过前面的演示发现，从表象上来看Promise的本质也就是使用回调函数方式去定义异步任务结束后所需要执行的任务。只不过这里的回调函数是通过then方法传递进去的，只不过promise将我们的回调分成了两种：成功过后的回调（onFulfilled），失败过后的回调（onRejected）。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function onFulfilledc(value) &#123;</span><br><span class="line">  console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;,function onReject () &#123;</span><br><span class="line">  console.log(&#39;onRejected&#39;, error)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>嵌套使用的方式是使用Promise最常见的错误。错误使用示例</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&quot;&#x2F;api&#x2F;urls.json&quot;).then(function (urls) &#123;</span><br><span class="line">  ajax(urls.users).then(function(users)&#123;</span><br><span class="line">    ajax(urls.users).then(function(users)&#123;</span><br><span class="line">      ajax(urls.users).then(function(users)&#123;</span><br><span class="line">        ajax(urls.users).then(function(users)&#123;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>正确做法：借助于Promise.then方法链式调用的特点，尽可能保证异步任务的扁平化</p>
-</blockquote>
-<h4 id="Promise链式调用"><a href="#Promise链式调用" class="headerlink" title="Promise链式调用"></a>Promise链式调用</h4><p>Promise的链式调用能最大程度的避免回调嵌套。</p>
-<ul>
-<li>特点：<ul>
-<li>Promise对象的then方法会返回一个全新的Promise对象，所以我们可以使用链式调用的方式添加then方法。</li>
-<li>后面的then方法就是在为上一个then返回的Promise注册回调。</li>
-<li>前面then方法中回调函数的返回值会作为后面then方法回调的参数。</li>
-<li>如果回调中返回的是Promise对象，那后面then方法的回调会等待这个promise的结束。也就是说后面的promise方法，也就是为我们返回的promise对象，去注册了对应的回调。</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var promise &#x3D; ajax(&#39;&#x2F;api&#x2F;users.json&#39;);</span><br><span class="line">var promise2 &#x3D; promise.then( &#x2F;&#x2F;then方法作用：为promise对象，去添加状态明确后的回调函数</span><br><span class="line">  function onFulfilled (value) &#123;&#x2F;&#x2F; 成功后的回调</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">  &#125;,</span><br><span class="line">  function onRejected(error)&#123;&#x2F;&#x2F; 失败后的回调，可省略</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br><span class="line">console.log(promise2 &#x3D;&#x3D;&#x3D; promise); &#x2F;&#x2F; false 返回的是一个全新的promise对象</span><br></pre></td></tr></table></figure>
-<p>返回一个全新Promise对象的目的是为了实现一个promise链，一个承诺结束之后，返回一个新的承诺，每个承诺都可以负责一个异步任务相互之间没什么影响。意味着，如果我们不断调用链式then方法，这里的每一个then方法实际上是为了上一个then方法返回的promise对象去添加状态明确后的回调</p>
-<p>如果我们返回的不是一个promise而是一个普通的值，这个值就会作为这个then方法返回的这个promise中的值，在下一个then方法接收的回调参数实际上拿到就是这个值，若我们没有返回任何值，那默认返回就是undefined。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(1111);</span><br><span class="line">  &#x2F;&#x2F; 在回调中手动返回一个promise对象，那下一个then方法实际上是为这个promise对象去添加状态明确过后的回调。可以避免不必要的回调嵌套</span><br><span class="line">  &#x2F;&#x2F; return ajax(&#39;api&#x2F;urls.json&#39;);&#x2F;&#x2F; 意思是：这里的ajax调用之后</span><br><span class="line">&#125;)  &#x2F;&#x2F; &#x3D;&gt; Promise</span><br><span class="line">.then(function(value) &#123;&#x2F;&#x2F; 会自动执行这个方法中的回调</span><br><span class="line">  console.log(2222);</span><br><span class="line">  console.log(value);</span><br><span class="line">&#125;)  &#x2F;&#x2F; &#x3D;&gt; Promise</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(3333);</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(4444);</span><br><span class="line">  return &#39;foo&#39;;</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">  console.log(5555);</span><br><span class="line">  console.log(value); &#x2F;&#x2F; foo</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>如果有多个连续的任务，我们就可以使用这种链式调用的方式去避免回调的嵌套，从而尽量保证我们的代码的扁平化。</p>
-<h4 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h4><p>处理异常的两种方式：</p>
-<ol>
-<li>通过then方法第二个参数去指定的失败的回调函数;</li>
-<li>用catch方法去指定失败回调。</li>
-</ol>
-<h5 id="通过then方法第二个参数去指定的失败的回调函数"><a href="#通过then方法第二个参数去指定的失败的回调函数" class="headerlink" title="通过then方法第二个参数去指定的失败的回调函数"></a>通过then方法第二个参数去指定的失败的回调函数</h5><p>onRejected回调实际上是为promise中的异常去做一些处理，在promise失败或者出现异常时，它都会被执行。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;,function onRejected(error) &#123;</span><br><span class="line">    &#x2F;&#x2F; promise 的结果失败，就会调用这个onRejected回调函数在promise执行过程中出现了异常，或者我们手动抛出异常也会执行这个回调函数</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h5 id="用catch方法去指定失败回调"><a href="#用catch方法去指定失败回调" class="headerlink" title="用catch方法去指定失败回调"></a>用catch方法去指定失败回调</h5><p>用catch方法去指定失败回调更为常见，因为这种方式更适合链式调用。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;)</span><br><span class="line">.catch(function onRejcted(error) &#123;</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line">&#x2F;&#x2F; 这里的catch实际上时then方法的别名，因为我们调用它，相当于调用了then方法，不过第一个参数传递的是undefined，第二个是onRejected回调函数</span><br><span class="line"></span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users1111.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">&#125;)</span><br><span class="line">.then(undefined, function onRejcted(error) &#123;</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<h5 id="这两种方式的差异"><a href="#这两种方式的差异" class="headerlink" title="这两种方式的差异"></a>这两种方式的差异</h5><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 两者的差异对比</span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">    return ajax(&#39;error-url&#39;);</span><br><span class="line">&#125;, function onRejcted(error) &#123; &#x2F;&#x2F; 没有捕获到 ajax(&#39;error-url&#39;) 发生的异常</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">ajax(&#39;&#x2F;api&#x2F;users11.json&#39;)</span><br><span class="line">.then(function onFulfilled(value) &#123;</span><br><span class="line">    console.log(&#39;onFulfilled&#39;, value);</span><br><span class="line">    return ajax(&#39;error-url&#39;);</span><br><span class="line">&#125;) &#x2F;&#x2F; &#x3D;&gt; Promsie &#123;&#125;</span><br><span class="line">.catch(function onRejcted(error) &#123; </span><br><span class="line">  &#x2F;&#x2F; 可以正常捕获到 ajax(&#39;error-url&#39;) 发生的异常。原因：我们这个失败回调，它是注册在上一个（也就是then方法返回的）promise对象上</span><br><span class="line">    console.log(&#39;onRejected&#39;, error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>那为什么会出现上面那种情况呢？</p>
-<ul>
-<li>因为每个then方法它返回的都是一个全新的promise对象，也就是说，我们在后面用链式调用的方式，调用的catch实际上是给前面的then方法返回的promise对象去指定失败回调，并不是直接去给第一个promise对象所指定的。只不过因为这是同一个promise链条，那前面promise上的异常会一直往后传递，所以我们在这里才能捕获到第一个promise中的异常。</li>
-<li>而通过then方法第二个参数去指定的失败的回调函数，它只是给第一个promise对象指定的，也就是说它只能捕获到这个promise对象的异常。</li>
-</ul>
-</li>
-<li><p>具体表象上的差异</p>
-<ul>
-<li>如果我们在then方法中返回了第二个promise，而且这个promise在执行中出现了异常，那我们使用then方法的第二个参数注册的回调，它是捕获不到第二个promise的异常的，因为它只是给第一个promise注册的失败回调。</li>
-<li>所以对于链式调用的情况下，建议使用第二种（catch）方式，去分开指定成功回调和失败回调。因为promise链条上任何一个异常都会被一直向后传递直至被捕获。也就是说，这种方式更像是为整个promise链条注册的失败回调，相对说更通用。</li>
-</ul>
-</li>
-</ul>
-<h4 id="Promise-静态方法"><a href="#Promise-静态方法" class="headerlink" title="Promise 静态方法"></a>Promise 静态方法</h4><h5 id="Promise-resolve"><a href="#Promise-resolve" class="headerlink" title="Promise.resolve()"></a>Promise.resolve()</h5><p>Promise.resolve()的作用：快速将一个值转化为promise对象。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.resolve(&#39;foo&#39;)&#x2F;&#x2F;直接返回一个状态为fulfilled的promise对象,这个&#39;foo&#39;就会作为这个promise对象所返回的值</span><br><span class="line">.then(function(value) &#123;</span><br><span class="line">    console.log(value);&#x2F;&#x2F; foo</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 上面等价于下面的</span><br><span class="line">new Promise(function(resolve, reject)&#123;</span><br><span class="line">    resolve(&#39;foo&#39;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>Promise.resolve方法如果接收到的是另一个promise对象，这个promise对象则会原样返回，也就是我们用Promise.resolve去包裹一个promise，得到的是被包裹的那个promise。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var promise &#x3D; ajax(&#39;&#x2F;api&#x2F;users.json&#39;);</span><br><span class="line">var promise2 &#x3D; Promise.resolve(promise);</span><br><span class="line">console.log(promise &#x3D;&#x3D;&#x3D; promise2); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
-<p>若我们传入的是一个对象，这个对象也有与promise一样的then方法，这样的对象也可以作为一个promise对象被执行，在后面的then方法中也能拿到这里所对应传入的值。</p>
-<p>这种带有then方法的对象实现了thenable接口，也就是说它是一个可以被then的对象。支持这种对象的原因，是因为在promise没有普及之前，我们都是使用第三方库去实现promise，如果我们想将第三方的promise对象换成原生的promise，就可以借助这样的机制，因为在第三方promise对象中也有相同的这种then方法，那就可以通过Promise.resolve将其转换成原生的promise对象。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.resolve(&#123;</span><br><span class="line">  then:function(onFulfilled, onRejected)&#123;</span><br><span class="line">      onFulfilled(&#39;foo&#39;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">.then(function(value)&#123;</span><br><span class="line">    console.log(value);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<h5 id="Promise-reject"><a href="#Promise-reject" class="headerlink" title="Promise.reject()"></a>Promise.reject()</h5><p>Promise.resolve()的作用：快速创建一个失败的promise对象。它的参数，无论我们传入什么参数，都会作为promise失败的理由（失败的原因）。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Promise.reject(new Error(&#39;rejected&#39;))</span><br><span class="line">.catch(function(error)&#123;</span><br><span class="line">    console.log(error);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">Promise.reject(&#39;anything&#39;)</span><br><span class="line">.catch(function(error)&#123;</span><br><span class="line">    console.log(error);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h4 id="Promise-并行执行"><a href="#Promise-并行执行" class="headerlink" title="Promise 并行执行"></a>Promise 并行执行</h4><p>前面的操作都是通过promise去串联多个异步任务，也就是一个任务之后，再去开启下一个任务。相对于传统的回调方式Promise提供了更扁平的异步体验。如果需要同时并行执行多个异步任务（比如请求多个接口，且他们之间没有相互依赖），promise也可以提供更完善的体验。</p>
-<h5 id="Promise-all"><a href="#Promise-all" class="headerlink" title="Promise.all()"></a>Promise.all()</h5><p>Promise.all()的作用：可以将多个Promise合并为一个Promise统一去管理。</p>
-<p>Promise.all():参数是数组，里面是一个个promise对象（每个promise对象可看作是一个异步任务），返回一个全新的promise对象。当内部所有的promise完成之后，我们所返回的这个全新的promise才会完成，此时这个promise对象拿到的结果就是数组，这个数组包含每个异步任务执行后的结果。</p>
-<blockquote>
-<p>注意：在这个任务过程中，只有这里面的任务都成功结束了，这个新的promise才会成功结束，如果这里有其中一个任务结束了，那这个promise就会以失败结束。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; Promise.all()能够很好的处理这种并行的异步请求</span><br><span class="line">var promise &#x3D; Promise.all([</span><br><span class="line">    ajax(&#39;&#x2F;api&#x2F;users.json&#39;),</span><br><span class="line">    ajax(&#39;&#x2F;api&#x2F;posts.json&#39;)</span><br><span class="line">]);</span><br><span class="line">promise.then(function (values)&#123;</span><br><span class="line">    console.log(values); &#x2F;&#x2F; (2) [Array(2), Array(2)]</span><br><span class="line">&#125;).catch(function (error)&#123;</span><br><span class="line">    console.log(error); &#x2F;&#x2F; GET http:&#x2F;&#x2F;localhost:8080&#x2F;api&#x2F;posts11.json 404 (Not Found)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>综合使用串联和并联这两种方式。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ajax(&#39;&#x2F;api&#x2F;urls.json&#39;)</span><br><span class="line">.then(value &#x3D;&gt; &#123;</span><br><span class="line">    const urls &#x3D; Object.values(value);</span><br><span class="line">    const task &#x3D; urls.map(url &#x3D;&gt; ajax(url));&#x2F;&#x2F; 返回的task是promise对象数组</span><br><span class="line">    return Promise.all(task);</span><br><span class="line">&#125;)</span><br><span class="line">.then(values &#x3D;&gt; &#123;</span><br><span class="line">    console.log(values);&#x2F;&#x2F; (2) [Array(2), Array(2)]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h5 id="Promise-race"><a href="#Promise-race" class="headerlink" title="Promise.race()"></a>Promise.race()</h5><p>Promis.race()的作用：也可以将多个Promise对象组合成一个全新的Promise对象。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const request &#x3D; ajax(&#39;&#x2F;api&#x2F;posts.json&#39;)</span><br><span class="line">const timeout &#x3D; new Promise((resolve, reject) &#x3D;&gt; &#123;</span><br><span class="line">    setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">        reject(new Error(&#39;timeout&#39;))</span><br><span class="line">    &#125;, 500);</span><br><span class="line">&#125;)</span><br><span class="line">&#x2F;&#x2F; 效果：如果500毫秒内请求完成了，就可以正常得到响应结果，如果500毫秒之后，请求就无法将请求返回因为在500毫秒后我们的第二个promise会以失败方式结束，而race方法就是以第一个结束的promise为准</span><br><span class="line">Promise.race([</span><br><span class="line">  request,</span><br><span class="line">  timeout</span><br><span class="line">])</span><br><span class="line">.then(value &#x3D;&gt; &#123;</span><br><span class="line">  console.log(value) &#x2F;&#x2F; Array(2)</span><br><span class="line">&#125;)</span><br><span class="line">.catch(error &#x3D;&gt; &#123;</span><br><span class="line">  console.log(error) &#x2F;&#x2F; Error: timeout</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h5 id="Promise-all-）与-Promise-race-的区别"><a href="#Promise-all-）与-Promise-race-的区别" class="headerlink" title="Promise.all(）与 Promise.race()的区别"></a>Promise.all(）与 Promise.race()的区别</h5><p>Promose.all()等待所有的任务结束后才会结束（所有的任务成功结束，才会成功结束），Promise.race()只会等待第一个结束的任务，也就是说只要任何一个任务完成了，那我们这个返回的新的Promise也就会完成。</p>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>promise</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ES6 之 Reflect</title>
     <url>/2021/12/02/reflect/</url>
     <content><![CDATA[<blockquote>
@@ -284,56 +334,6 @@
       </categories>
       <tags>
         <tag>Reflect</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ES6 之 Symbol</title>
-    <url>/2021/12/02/symbol/</url>
-    <content><![CDATA[<blockquote>
-<p>Symbol是一种全新的基本数据类型，在未来可能还会添加一个BigInt的原始数据类型，用于存放更长的数字(这个现在处于stage-4阶段，标准化之后，那就有8种原始数据类型)。</p>
-</blockquote>
-<a id="more"></a>
-
-<h4 id="为什么需要Symbol？"><a href="#为什么需要Symbol？" class="headerlink" title="为什么需要Symbol？"></a>为什么需要Symbol？</h4><p>在ES6之前对象的属性名都是字符串，而字符串的属性名是有可能重复的，那重复就会产生冲突。</p>
-<h4 id="实际场景出现的问题"><a href="#实际场景出现的问题" class="headerlink" title="实际场景出现的问题"></a>实际场景出现的问题</h4><p>很多情况下我们大量使用第三方模块，很多时候我们需要扩展第三方模块中的对象，此时我们不知道这个对象中是否存在某个指定的键，如果这时候贸贸然直接扩展，就有可能会产生冲突。</p>
-<h4 id="以前的解决方案"><a href="#以前的解决方案" class="headerlink" title="以前的解决方案"></a>以前的解决方案</h4><p>以前是采用约定的方式，例如，a文件下的键就命名为a_foo,b文件下就命名为b_foo,但是这并没有解决问题，只是规避问题。假如在多人合作开发时有人遵守约定，那就很容易出问题。</p>
-<p>举个约定的栗子(便于展示，这里用 ==== 代表一个单独的文件)：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; share.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">const cache &#x3D; &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;a_foo&#39;] &#x3D; Math.random();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">cache[&#39;b_foo&#39;] &#x3D; &#39;123&#39;;</span><br></pre></td></tr></table></figure>
-<p>而ES6为了解决上述问题，提供了一个全新的原始数据类型Symbol</p>
-<h4 id="Symbol的作用"><a href="#Symbol的作用" class="headerlink" title="Symbol的作用"></a>Symbol的作用</h4><p>Symbol的作用是表示一个独一无二的值。在实际应用中，它最主要的作用就是为对象添加独一无二的属性名。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s &#x3D; Symbol();</span><br><span class="line">console.log(s); &#x2F;&#x2F; Symbol()</span><br><span class="line">console.log(typeof s) &#x2F;&#x2F; symbol</span><br><span class="line"></span><br><span class="line">console.log(Symbol() &#x3D;&#x3D;&#x3D; Symbol());&#x2F;&#x2F; false，值是唯一的，我们没有办法去创建一个完全一样的Symbol成员</span><br></pre></td></tr></table></figure>
-<h4 id="Symbol-的使用"><a href="#Symbol-的使用" class="headerlink" title="Symbol 的使用"></a>Symbol 的使用</h4><h5 id="Symbol允许传入字符串参数"><a href="#Symbol允许传入字符串参数" class="headerlink" title="Symbol允许传入字符串参数"></a>Symbol允许传入字符串参数</h5><p>考虑到开发中的调试，Symbol函数允许我们传入字符串作为调试文本。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Symbol(&#39;foo&#39;));&#x2F;&#x2F; Symbol(foo)</span><br><span class="line">console.log(Symbol(&#39;bar&#39;));&#x2F;&#x2F; Symbol(bar)</span><br><span class="line">console.log(Symbol(&#39;baz&#39;));&#x2F;&#x2F; Symbol(baz)</span><br></pre></td></tr></table></figure>
-<h5 id="使用Symbol作为对象属性名"><a href="#使用Symbol作为对象属性名" class="headerlink" title="使用Symbol作为对象属性名"></a>使用Symbol作为对象属性名</h5><p>在ES6及之后，对象允许使用Symbol类型的值作为属性名。现在对象的属性名可以是两种类型：string和Symbol。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;&#125;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;123&#39;</span><br><span class="line">obj[Symbol()] &#x3D; &#39;456&#39;;</span><br><span class="line">console.log(obj); &#x2F;&#x2F; &#123; [Symbol()]: &#39;123&#39;, [Symbol()]: &#39;456&#39; &#125;</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">    [Symbol()]: 123</span><br><span class="line">&#125;</span><br><span class="line">console.log(obj);&#x2F;&#x2F; &#123; [Symbol()]: 123 &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="使用Symbol去创建私有属性"><a href="#使用Symbol去创建私有属性" class="headerlink" title="使用Symbol去创建私有属性"></a>使用Symbol去创建私有属性</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; a.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; 使用Symbol去创建私有的属性名</span><br><span class="line">const name &#x3D; Symbol();</span><br><span class="line">const person &#x3D; &#123;</span><br><span class="line">    [name]: &#39;xh&#39;,</span><br><span class="line">    say() &#123;</span><br><span class="line">        console.log(this[name]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; b.js &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x2F;&#x2F; person[Symbol()];&#x2F;&#x2F; 访问不到a.js文件中的person的name属性</span><br><span class="line">person.say();&#x2F;&#x2F; xh</span><br></pre></td></tr></table></figure>
-<h4 id="Symbol补充"><a href="#Symbol补充" class="headerlink" title="Symbol补充"></a>Symbol补充</h4><h5 id="唯一性"><a href="#唯一性" class="headerlink" title="唯一性"></a>唯一性</h5><p>每次通过Symbol函数创建的值一定是唯一值，不管我们传入的描述文本是不是相同的，那每次调用Symbol函数它得到的值都是全新的值。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(</span><br><span class="line">  Symbol() &#x3D;&#x3D;&#x3D; Symbol(), &#x2F;&#x2F; false</span><br><span class="line">  Symbol(&#39;foo&#39;) &#x3D;&#x3D;&#x3D; Symbol(&#39;foo&#39;) &#x2F;&#x2F; false</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h5 id="如何在全局复用相同的Symbol值？"><a href="#如何在全局复用相同的Symbol值？" class="headerlink" title="如何在全局复用相同的Symbol值？"></a>如何在全局复用相同的Symbol值？</h5><ul>
-<li>使用全局变量的方式去实现</li>
-<li>使用Symbol类型提供的静态方法（for）去实现<ul>
-<li>使用for方法，这个方法可以接受一个字符串作为参数，相同的字符串就一定会返回相同的Symbol类型的值。这个方法内部维护了一个全局的注册表，为我们的字符串和symbol值提供了一一对应的关系。</li>
-<li><blockquote>
-<p>注意：这个方法内部维护的是字符串和symbol值一一对应的关系，如果我们传入的不是字符串，那这个方法会将其自动转换为字符串。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const s1 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">const s2 &#x3D; Symbol.for(&#39;foo&#39;);</span><br><span class="line">console.log(s1 &#x3D;&#x3D;&#x3D; s2);&#x2F;&#x2F; true</span><br><span class="line"></span><br><span class="line">console.log(</span><br><span class="line">  Symbol.for(&#39;true&#39;) &#x3D;&#x3D;&#x3D; Symbol.for(true)</span><br><span class="line">); &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
-<h5 id="Symbol内置常量"><a href="#Symbol内置常量" class="headerlink" title="Symbol内置常量"></a>Symbol内置常量</h5><p>Symbol类型中提供了很多内置Symbol常量，用来去作为内部方法的标识，这些标识符可以让自定义对象去实现一些JS中内置的接口。例如：iterator、hasInstance等等</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 这种symbol（symbol常量）为我们后面为对象实现迭代器时会经常用到</span><br><span class="line">console.log(Symbol.iterator);</span><br><span class="line">console.log(Symbol.hasInstance);</span><br><span class="line"></span><br><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  &#x2F;&#x2F; 自定义对象的toString标签：可以添加一个特定的成员去标识（使用字符串去添加标识符，可能会跟内部成员产生冲突，ECMAScript要求我们使用Symbol来实现这个标识）</span><br><span class="line">  [Symbol.toStringTag]: &#39;Xobject&#39;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;原本的： [object Object] &#x3D;&#x3D;&gt;叫对象的toString标签</span><br><span class="line">console.log(obj.toString()) &#x2F;&#x2F;修改后的： [object Xobject]</span><br></pre></td></tr></table></figure>
-<h5 id="使用symbol值去作为对象的属性名"><a href="#使用symbol值去作为对象的属性名" class="headerlink" title="使用symbol值去作为对象的属性名"></a>使用symbol值去作为对象的属性名</h5><p>使用symbol值去作为对象的属性名，通过for…of..循环、Object.keys()、JSON.toStringify()序列化，都是获取不到的。这种特性表示Symbol类型特别适合作为对象的私有属性。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">const obj &#x3D; &#123;</span><br><span class="line">  [Symbol()]: &#39;symbol value&#39;,</span><br><span class="line">  for: &#39;normal value&#39;</span><br><span class="line">&#125;</span><br><span class="line">for (var key in obj) &#123;</span><br><span class="line">  console.log(key); &#x2F;&#x2F; foo</span><br><span class="line">&#125;</span><br><span class="line">console.log(Object.keys(obj));&#x2F;&#x2F; [&#39;foo&#39;]</span><br><span class="line">console.log(JSON.stringify(obj)) &#x2F;&#x2F; &#123;&quot;for&quot;:&quot;normal value&quot;&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="如何获取symbol类型的属性名"><a href="#如何获取symbol类型的属性名" class="headerlink" title="如何获取symbol类型的属性名"></a>如何获取symbol类型的属性名</h5><p>使用Object.getOwnPropertySymbols(obj)方法，作用与Object.keys方法类似。不同的是Object.keys方法只能获取到对象中所有的字符串属性名，而Object.getOwnPropertySymbols(obj)方法，它获取到的全是Symbol属性名。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">console.log(Object.getOwnPropertySymbols(obj)); &#x2F;&#x2F; [ Symbol() ]</span><br></pre></td></tr></table></figure>
-<p>感谢您的阅读～</p>
-]]></content>
-      <categories>
-        <category>ES6+系列</category>
-      </categories>
-      <tags>
-        <tag>Symbol</tag>
       </tags>
   </entry>
   <entry>
@@ -429,5 +429,10 @@
       <tags>
         <tag>异步编程</tag>
       </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/12/08/AsyncCode/AsyncCode2/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>
